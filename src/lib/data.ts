@@ -1,5 +1,6 @@
+
 import { differenceInHours, parseISO } from 'date-fns';
-import type { Package, User } from './types';
+import type { Package, User, DistributorLevel } from './types';
 
 // Data based on user request:
 // 1300 - receive daily 146 for 16days making a total of 2336.
@@ -18,6 +19,14 @@ export const packages: Package[] = [
   { id: 5, name: "Pro Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 20800, dailyReturn: 436, durationDays: 130, totalReturn: 56680, image: "", isActive: true },
   { id: 6, name: "Elite Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 39000, dailyReturn: 748, durationDays: 200, totalReturn: 149600, image: "", isActive: true },
   { id: 7, name: "Elite Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 65000, dailyReturn: 1000, durationDays: 260, totalReturn: 260000, image: "", isActive: true },
+];
+
+export const distributorLevels: DistributorLevel[] = [
+    { level: 'V1', monthlyDividend: 6500, purchasedProducts: 2, deposit: 39000 },
+    { level: 'V2', monthlyDividend: 13000, purchasedProducts: 3, deposit: 78000 },
+    { level: 'V3', monthlyDividend: 26000, purchasedProducts: 4, deposit: 156000 },
+    { level: 'V4', monthlyDividend: 43333, purchasedProducts: 5, deposit: 260000 },
+    { level: 'V5', monthlyDividend: 108333, purchasedProducts: 6, deposit: 650000 },
 ];
 
 export const mockUser: User = {

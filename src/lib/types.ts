@@ -1,3 +1,4 @@
+
 export interface User {
   id: number;
   name: string;
@@ -63,4 +64,11 @@ export interface Wallet {
   balance: number;
   totalRecharge: number;
   totalWithdrawal: number;
+}
+
+export interface DistributorLevel {
+  level: string;
+  monthlyDividend: number;
+  purchasedProducts: number;
+  deposit: number;
 }

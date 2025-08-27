@@ -1,3 +1,4 @@
+
 'use client';
 import type { User } from '@/lib/types';
 import {
@@ -19,6 +20,7 @@ import {
   Shield,
   UserCog,
   Settings,
+  Landmark,
 } from 'lucide-react';
 
 interface SidebarNavProps {
@@ -28,6 +30,7 @@ interface SidebarNavProps {
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/investments', label: 'Investments', icon: Package },
+  { href: '/dividends', label: 'Company Dividends', icon: Landmark },
   { href: '/commissions', label: 'Commissions', icon: HandCoins },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/account', label: 'Account', icon: Settings },
@@ -88,5 +91,3 @@ export function SidebarNav({ user }: SidebarNavProps) {
     </SidebarMenu>
   );
 }
-
-    
