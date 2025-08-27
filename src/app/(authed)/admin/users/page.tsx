@@ -1,6 +1,6 @@
 
 'use client';
-import { allUsers } from "@/lib/data";
+import { allUsers as initialUsers } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -15,16 +15,41 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EditUserSheet } from "@/components/admin/edit-user-sheet";
+import { useState } from "react";
+import type { User } from "@/lib/types";
 
 export default function AdminUsersPage() {
+    const [users, setUsers] = useState<User[]>(initialUsers);
+
+    const handleSave = (newUser: User) => {
+        if(newUser.id) {
+            setUsers(users.map(u => u.id === newUser.id ? newUser : u));
+        } else {
+             // A real implementation would get a new ID from a database
+            const newId = Math.max(...users.map(u => u.id)) + 1;
+            const userWithId = {
+                ...newUser,
+                id: newId,
+                wallet: { id: newId, userId: newId, balance: 0, totalRecharge: 0, totalWithdrawal: 0 },
+                investments: [],
+                transactions: [],
+                referralsMade: [],
+            };
+            setUsers([...users, userWithId]);
+        }
+    }
+
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Users</CardTitle>
-        <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add User
-        </Button>
+        <EditUserSheet onSave={handleSave}>
+            <Button size="sm">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add User
+            </Button>
+        </EditUserSheet>
       </CardHeader>
       <CardContent>
         <Table>
@@ -37,7 +62,7 @@ export default function AdminUsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {allUsers.map((user) => (
+            {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>
                     <div className="flex items-center gap-3">
@@ -59,7 +84,7 @@ export default function AdminUsersPage() {
                 </TableCell>
                 <TableCell>Ksh {user.wallet.balance.toLocaleString()}</TableCell>
                 <TableCell>
-                    <EditUserSheet user={user} />
+                    <EditUserSheet user={user} onSave={handleSave} />
                 </TableCell>
               </TableRow>
             ))}

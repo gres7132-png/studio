@@ -1,3 +1,5 @@
+
+'use client';
 import { mockUser } from '@/lib/data';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -13,6 +15,7 @@ import {
 } from '@/components/ui/table';
 import { format, parseISO } from 'date-fns';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useToast } from '@/hooks/use-toast';
 
 export default function CommissionsPage() {
   const { referralsMade, id } = mockUser;
@@ -21,6 +24,15 @@ export default function CommissionsPage() {
     (sum, ref) => sum + ref.commissionAmount,
     0
   );
+  const { toast } = useToast();
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(referralLink);
+    toast({
+      title: "Copied to clipboard!",
+      description: "Your referral link has been copied.",
+    });
+  }
 
   return (
     <div className="space-y-8">
@@ -39,7 +51,7 @@ export default function CommissionsPage() {
           <CardContent>
             <div className="flex items-center space-x-2">
               <Input value={referralLink} readOnly />
-              <Button variant="outline" size="icon">
+              <Button variant="outline" size="icon" onClick={handleCopy}>
                 <Copy className="h-4 w-4" />
               </Button>
             </div>
