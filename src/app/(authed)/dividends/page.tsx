@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { Button } from "@/components/ui/button";
@@ -14,7 +15,7 @@ export default function DividendsPage() {
                 <h1 className="text-2xl font-headline md:text-3xl">Company Dividends</h1>
                 <p className="text-muted-foreground">
                     View and manage your distributor dividends.
-                p>
+                </p>
             </div>
 
             <div className="grid gap-6 md:grid-cols-2">
@@ -73,5 +74,5 @@ export default function DividendsPage() {
                 </CardContent>
             </Card>
         </div>
-    )
+    );
 }
