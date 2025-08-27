@@ -1,8 +1,8 @@
 import type { Package } from '@/lib/types';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { ArrowRight, Tag } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
+import Link from 'next/link';
 
 interface PackagesListProps {
   packages: Package[];
@@ -35,8 +35,10 @@ export function PackagesList({ packages }: PackagesListProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">
-              Purchase Rights <ArrowRight className="ml-2 h-4 w-4" />
+            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" asChild>
+              <Link href="/wallet">
+                Purchase Rights <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
             </Button>
           </CardFooter>
         </Card>
