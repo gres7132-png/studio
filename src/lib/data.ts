@@ -1,3 +1,4 @@
+import { differenceInHours, parseISO } from 'date-fns';
 import type { Package, User } from './types';
 
 // Data based on user request:
@@ -52,8 +53,14 @@ export const mockUser: User = {
 };
 
 export const getTodaysEarnings = (user: User) => {
+    const now = new Date();
     return user.investments
-        .filter(inv => inv.status === 'active')
+        .filter(inv => {
+            if (inv.status !== 'active') return false;
+            const investmentDate = parseISO(inv.createdAt);
+            const hoursSinceInvestment = differenceInHours(now, investmentDate);
+            return hoursSinceInvestment >= 24;
+        })
         .reduce((total, inv) => total + inv.package.dailyReturn, 0);
 };
 
