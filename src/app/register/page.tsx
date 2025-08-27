@@ -1,3 +1,5 @@
+
+'use client';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,28 +12,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function RegisterPage({
   searchParams,
 }: {
   searchParams: { ref?: string };
 }) {
-    async function register() {
-        'use server';
-        redirect('/dashboard');
+    const router = useRouter();
+    async function register(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        router.push('/dashboard');
     }
 
   return (
     <div className="w-full max-w-md">
-      <form action={register}>
+      <form onSubmit={register}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">Create an Account</CardTitle>
             <CardDescription>
               Join us to start investing in marketing rights.
             </CardDescription>
-          </CardHeader>
+          </Header>
           <CardContent className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>

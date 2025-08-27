@@ -1,3 +1,5 @@
+
+'use client';
 import { packages } from "@/lib/data";
 import {
   Table,

@@ -1,3 +1,5 @@
+
+'use client';
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -10,17 +12,19 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
-    async function login() {
-        'use server';
-        redirect('/dashboard');
+    const router = useRouter();
+
+    async function login(e: React.FormEvent<HTMLFormElement>) {
+        e.preventDefault();
+        router.push('/dashboard');
     }
 
   return (
     <div className="w-full max-w-md">
-      <form action={login}>
+      <form onSubmit={login}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="font-headline text-2xl">Welcome Back</CardTitle>

@@ -1,4 +1,5 @@
 
+'use client';
 import { allUsers } from "@/lib/data";
 import {
   Table,
@@ -11,8 +12,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EditUserSheet } from "@/components/admin/edit-user-sheet";
 
@@ -59,12 +59,7 @@ export default function AdminUsersPage() {
                 </TableCell>
                 <TableCell>Ksh {user.wallet.balance.toLocaleString()}</TableCell>
                 <TableCell>
-                    <EditUserSheet user={user}>
-                         <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                        </Button>
-                    </EditUserSheet>
+                    <EditUserSheet user={user} />
                 </TableCell>
               </TableRow>
             ))}
