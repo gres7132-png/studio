@@ -48,13 +48,16 @@ export function SidebarNav({ user }: SidebarNavProps) {
         <SidebarGroupLabel>User Menu</SidebarGroupLabel>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.href}>
-            <Link href={item.href} legacyBehavior passHref>
+            <Link href={item.href} passHref>
               <SidebarMenuButton
+                asChild
                 isActive={pathname === item.href}
                 tooltip={item.label}
               >
-                <item.icon />
-                <span>{item.label}</span>
+                <div>
+                  <item.icon />
+                  <span>{item.label}</span>
+                </div>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
@@ -67,13 +70,16 @@ export function SidebarNav({ user }: SidebarNavProps) {
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
             {adminNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} legacyBehavior passHref>
+                <Link href={item.href} passHref>
                   <SidebarMenuButton
+                    asChild
                     isActive={pathname === item.href}
                     tooltip={item.label}
                   >
-                    <item.icon />
-                    <span>{item.label}</span>
+                    <div>
+                      <item.icon />
+                      <span>{item.label}</span>
+                    </div>
                   </SidebarMenuButton>
                 </Link>
               </SidebarMenuItem>
