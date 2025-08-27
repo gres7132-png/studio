@@ -5,11 +5,34 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { distributorLevels } from "@/lib/data";
+import { distributorLevels, mockUser } from "@/lib/data";
 import Link from "next/link";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 export default function DividendsPage() {
+    const [pendingDividends, setPendingDividends] = useState(5000); // Mocked pending dividends
+    const { toast } = useToast();
+
+    const handleReleaseDividends = () => {
+        if (pendingDividends > 0) {
+            // In a real app, this would trigger an API call to process the withdrawal.
+            // For now, we just simulate it.
+            toast({
+                title: "Withdrawal Initiated",
+                description: `Your request to withdraw Ksh ${pendingDividends.toLocaleString()} has been submitted. It may take up to 4 working days to process.`,
+            });
+            setPendingDividends(0);
+        } else {
+            toast({
+                title: "No Pending Dividends",
+                description: "You have no pending dividends to withdraw.",
+                variant: "destructive",
+            });
+        }
+    };
 
     return (
         <div className="space-y-8">
@@ -40,11 +63,31 @@ export default function DividendsPage() {
                  <Card className="shadow-md bg-green-500 text-white">
                     <CardHeader className="flex flex-row items-center justify-between">
                         <CardTitle className="text-sm font-semibold">PENDING DIVIDENDS</CardTitle>
-                         <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white">Apply for Release</Button>
+                         <AlertDialog>
+                            <AlertDialogTrigger asChild>
+                                <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white" disabled={pendingDividends === 0}>
+                                    Apply for Release
+                                </Button>
+                            </AlertDialogTrigger>
+                            <AlertDialogContent>
+                                <AlertDialogHeader>
+                                <AlertDialogTitle>Confirm Dividend Withdrawal</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Are you sure you want to withdraw your pending dividends of Ksh {pendingDividends.toLocaleString()}? This action cannot be undone.
+                                </AlertDialogDescription>
+                                </AlertDialogHeader>
+                                <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={handleReleaseDividends}>
+                                    Confirm Withdrawal
+                                </AlertDialogAction>
+                                </AlertDialogFooter>
+                            </AlertDialogContent>
+                         </AlertDialog>
                     </CardHeader>
                     <CardContent>
                         <p className="text-4xl font-bold">
-                            KSH 0
+                            KSH {pendingDividends.toLocaleString()}
                         </p>
                     </CardContent>
                 </Card>
