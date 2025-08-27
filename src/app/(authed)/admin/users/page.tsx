@@ -12,7 +12,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { MoreHorizontal, PlusCircle } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { EditUserSheet } from "@/components/admin/edit-user-sheet";
 
 export default function AdminUsersPage() {
   return (
@@ -40,7 +41,6 @@ export default function AdminUsersPage() {
                 <TableCell>
                     <div className="flex items-center gap-3">
                        <Avatar className="h-9 w-9">
-                         
                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                        </Avatar>
                        <div className="font-medium">
@@ -58,19 +58,21 @@ export default function AdminUsersPage() {
                 </TableCell>
                 <TableCell>Ksh {user.wallet.balance.toLocaleString()}</TableCell>
                 <TableCell>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>View Investments</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                    <EditUserSheet user={user}>
+                        <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" className="h-8 w-8 p-0">
+                                    <span className="sr-only">Open menu</span>
+                                    <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                                <DropdownMenuItem>Edit</DropdownMenuItem>
+                                <DropdownMenuItem>View Investments</DropdownMenuItem>
+                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </EditUserSheet>
                 </TableCell>
               </TableRow>
             ))}
