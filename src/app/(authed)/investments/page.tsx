@@ -60,15 +60,15 @@ export default function InvestmentsPage() {
                 <div className="grid gap-4 md:grid-cols-3">
                     <div>
                         <div className="text-sm text-muted-foreground">Investment</div>
-                        <div className="text-lg font-semibold">${inv.amount.toLocaleString()}</div>
+                        <div className="text-lg font-semibold">Ksh {inv.amount.toLocaleString()}</div>
                     </div>
                      <div>
                         <div className="text-sm text-muted-foreground">Total Earnings</div>
-                        <div className="text-lg font-semibold text-green-600">${inv.earnings.toLocaleString()}</div>
+                        <div className="text-lg font-semibold text-green-600">Ksh {inv.earnings.toLocaleString()}</div>
                     </div>
                     <div>
                         <div className="text-sm text-muted-foreground">Expected Return</div>
-                        <div className="text-lg font-semibold text-primary">${inv.package.totalReturn.toLocaleString()}</div>
+                        <div className="text-lg font-semibold text-primary">Ksh {inv.package.totalReturn.toLocaleString()}</div>
                     </div>
                 </div>
                 {inv.status === 'active' && (

@@ -15,7 +15,7 @@ export default function AdminDashboardPage() {
     const stats = [
         { title: "Total Users", value: totalUsers, icon: Users },
         { title: "Total Investments", value: totalInvestments, icon: Package },
-        { title: "Successful Transactions", value: `$${totalTransactionValue.toLocaleString()}`, icon: HandCoins },
+        { title: "Successful Transactions", value: `Ksh ${totalTransactionValue.toLocaleString()}`, icon: HandCoins },
     ];
 
     return (

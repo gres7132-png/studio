@@ -47,7 +47,7 @@ export function RecentTransactions({ transactions }: RecentTransactionsProps) {
               <TableRow key={tx.id}>
                 <TableCell className="font-medium capitalize">{tx.type}</TableCell>
                 <TableCell>{tx.paymentMethod}</TableCell>
-                <TableCell>${tx.amount.toLocaleString()}</TableCell>
+                <TableCell>Ksh {tx.amount.toLocaleString()}</TableCell>
                 <TableCell>
                   <Badge variant={getStatusVariant(tx.status)} className="capitalize">
                     {tx.status}

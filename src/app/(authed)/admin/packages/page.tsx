@@ -39,8 +39,8 @@ export default function AdminPackagesPage() {
             {packages.map((pkg) => (
               <TableRow key={pkg.id}>
                 <TableCell className="font-medium">{pkg.name}</TableCell>
-                <TableCell>${pkg.price.toLocaleString()}</TableCell>
-                <TableCell>${pkg.dailyReturn.toLocaleString()}</TableCell>
+                <TableCell>Ksh {pkg.price.toLocaleString()}</TableCell>
+                <TableCell>Ksh {pkg.dailyReturn.toLocaleString()}</TableCell>
                 <TableCell>{pkg.durationDays} days</TableCell>
                 <TableCell>
                   <Badge variant={pkg.isActive ? 'default' : 'destructive'}>

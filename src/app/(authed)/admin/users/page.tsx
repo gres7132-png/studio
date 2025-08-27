@@ -40,7 +40,7 @@ export default function AdminUsersPage() {
                 <TableCell>
                     <div className="flex items-center gap-3">
                        <Avatar className="h-9 w-9">
-                         <AvatarImage src={`https://picsum.photos/seed/${user.id}/100`} alt={user.name} data-ai-hint="profile picture" />
+                         
                          <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
                        </Avatar>
                        <div className="font-medium">
@@ -56,7 +56,7 @@ export default function AdminUsersPage() {
                         <Badge variant="outline">User</Badge>
                     )}
                 </TableCell>
-                <TableCell>${user.wallet.balance.toLocaleString()}</TableCell>
+                <TableCell>Ksh {user.wallet.balance.toLocaleString()}</TableCell>
                 <TableCell>
                     <DropdownMenu>
                         <DropdownMenuTrigger asChild>

@@ -24,7 +24,7 @@ export default function WalletPage() {
                 <WalletIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-                <div className="text-4xl font-bold text-primary">${wallet.balance.toLocaleString()}</div>
+                <div className="text-4xl font-bold text-primary">Ksh {wallet.balance.toLocaleString()}</div>
             </CardContent>
         </Card>
 

@@ -10,13 +10,13 @@ import type { Package, User } from './types';
 // 65000 makes 1000 daily for 260 days making 260000.
 
 export const packages: Package[] = [
-  { id: 1, name: "Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 1300, dailyReturn: 146, durationDays: 16, totalReturn: 2336, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 2, name: "Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 2800, dailyReturn: 373, durationDays: 15, totalReturn: 5595, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 3, name: "Marketer Tier 3", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 3900, dailyReturn: 212, durationDays: 35, totalReturn: 7420, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 4, name: "Pro Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 9750, dailyReturn: 278, durationDays: 70, totalReturn: 19460, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 5, name: "Pro Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 20800, dailyReturn: 436, durationDays: 130, totalReturn: 56680, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 6, name: "Elite Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 39000, dailyReturn: 748, durationDays: 200, totalReturn: 149600, image: "https://picsum.photos/600/400", isActive: true },
-  { id: 7, name: "Elite Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 65000, dailyReturn: 1000, durationDays: 260, totalReturn: 260000, image: "https://picsum.photos/600/400", isActive: true },
+  { id: 1, name: "Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 1300, dailyReturn: 146, durationDays: 16, totalReturn: 2336, image: "", isActive: true },
+  { id: 2, name: "Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 2800, dailyReturn: 373, durationDays: 15, totalReturn: 5595, image: "", isActive: true },
+  { id: 3, name: "Marketer Tier 3", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 3900, dailyReturn: 212, durationDays: 35, totalReturn: 7420, image: "", isActive: true },
+  { id: 4, name: "Pro Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 9750, dailyReturn: 278, durationDays: 70, totalReturn: 19460, image: "", isActive: true },
+  { id: 5, name: "Pro Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 20800, dailyReturn: 436, durationDays: 130, totalReturn: 56680, image: "", isActive: true },
+  { id: 6, name: "Elite Marketer Tier 1", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 39000, dailyReturn: 748, durationDays: 200, totalReturn: 149600, image: "", isActive: true },
+  { id: 7, name: "Elite Marketer Tier 2", description: "Purchase of Balenciaga product marketing rights as a sales and marketer.", price: 65000, dailyReturn: 1000, durationDays: 260, totalReturn: 260000, image: "", isActive: true },
 ];
 
 export const mockUser: User = {
@@ -37,7 +37,7 @@ export const mockUser: User = {
     { id: 2, userId: 1, packageId: 2, package: packages[1], amount: 2800, startDate: "2024-06-01", endDate: "2024-06-16", status: 'completed', earnings: 5595, createdAt: "2024-06-01T11:00:00Z" }
   ],
   transactions: [
-    { id: 1, userId: 1, type: 'deposit', amount: 10000, status: 'success', paymentMethod: 'M-Pesa', createdAt: "2024-07-15T09:00:00Z" },
+    { id: 1, userId: 1, type: 'deposit', amount: 10000, status: 'success', paymentMethod: 'Airtel Money', createdAt: "2024-07-15T09:00:00Z" },
     { id: 2, userId: 1, type: 'investment', amount: 1300, status: 'success', paymentMethod: 'wallet', createdAt: "2024-07-10T10:00:00Z" },
     { id: 3, userId: 1, type: 'withdrawal', amount: 2000, status: 'success', paymentMethod: 'wallet', createdAt: "2024-07-05T14:00:00Z" },
     { id: 4, userId: 1, type: 'commission', amount: 65, status: 'success', paymentMethod: 'referral', createdAt: "2024-07-02T18:00:00Z" },

@@ -6,13 +6,15 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Textarea } from '@/components/ui/textarea';
-import { Copy } from 'lucide-react';
+import { Copy, Link as LinkIcon } from 'lucide-react';
 import { QrCode } from '../icons';
 import { Alert, AlertDescription, AlertTitle } from '../ui/alert';
+import Link from 'next/link';
 
 export function DepositForm() {
-  const [method, setMethod] = useState('mpesa');
-  const cryptoAddress = '0xAbC...dE42Fg';
+  const [method, setMethod] = useState('airtel');
+  const cryptoAddress = '0x737f077D9F12f3c1DFf624f69046635C82b4A466';
+  const minipayLink = 'https://link.minipay.xyz/invite?ref=lgBQTxG8';
 
   return (
     <Card className="shadow-md">
@@ -26,13 +28,17 @@ export function DepositForm() {
         <div className="space-y-2">
           <Label>Select Payment Method</Label>
           <RadioGroup
-            defaultValue="mpesa"
+            defaultValue="airtel"
             onValueChange={setMethod}
             className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-4"
           >
             <div className="flex items-center space-x-2">
-              <RadioGroupItem value="mpesa" id="mpesa" />
-              <Label htmlFor="mpesa">M-Pesa</Label>
+              <RadioGroupItem value="airtel" id="airtel" />
+              <Label htmlFor="airtel">Airtel Money</Label>
+            </div>
+             <div className="flex items-center space-x-2">
+              <RadioGroupItem value="minipay" id="minipay" />
+              <Label htmlFor="minipay">MiniPay</Label>
             </div>
             <div className="flex items-center space-x-2">
               <RadioGroupItem value="crypto" id="crypto" />
@@ -42,31 +48,42 @@ export function DepositForm() {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="amount">Amount (USD)</Label>
-          <Input id="amount" type="number" placeholder="e.g., 100" />
+          <Label htmlFor="amount">Amount (KES)</Label>
+          <Input id="amount" type="number" placeholder="e.g., 1300" />
         </div>
 
-        {method === 'mpesa' && (
+        {method === 'airtel' && (
           <div className="space-y-4">
             <Alert>
-              <AlertTitle className="font-headline">M-Pesa Payment Instructions</AlertTitle>
+              <AlertTitle className="font-headline">Airtel Money Instructions</AlertTitle>
               <AlertDescription>
-                1. Go to your M-Pesa menu.
-                <br />
-                2. Select "Lipa na M-Pesa".
-                <br />
-                3. Select "Pay Bill" and enter business number: <strong>400200</strong>.
-                <br />
-                4. Enter account number: <strong>BALENCIA</strong>.
-                <br />
-                5. Enter the equivalent amount in KES.
+                Send the exact amount to our Airtel number: <strong>0781309701</strong>.
+                <br/>
+                Then, paste the confirmation message below for verification.
               </AlertDescription>
             </Alert>
             <div className="space-y-2">
-                <Label htmlFor="confirmation">Paste M-Pesa Confirmation Message</Label>
-                <Textarea id="confirmation" placeholder="Paste the full M-Pesa confirmation message here for verification." />
+                <Label htmlFor="confirmation">Paste Airtel Confirmation Message</Label>
+                <Textarea id="confirmation" placeholder="Paste the full Airtel Money confirmation message here for verification." />
             </div>
           </div>
+        )}
+
+        {method === 'minipay' && (
+            <div className="space-y-4">
+                <Alert>
+                <AlertTitle className="font-headline">MiniPay Instructions</AlertTitle>
+                <AlertDescription>
+                    Click the link below to pay with MiniPay. The number <strong>0781309701</strong> can receive from MiniPay.
+                </AlertDescription>
+                </Alert>
+                <Button asChild className="w-full">
+                    <Link href={minipayLink} target="_blank">
+                        <LinkIcon className="mr-2 h-4 w-4" />
+                        Pay with MiniPay
+                    </Link>
+                </Button>
+            </div>
         )}
 
         {method === 'crypto' && (
@@ -74,7 +91,7 @@ export function DepositForm() {
              <Alert>
               <AlertTitle className="font-headline">Cryptocurrency (USDT) Payment</AlertTitle>
               <AlertDescription>
-                Send the exact USDT amount to the wallet address below (TRC-20 Network).
+                Send the exact USDT amount to the wallet address below (Celo Network).
               </AlertDescription>
             </Alert>
             <div className="flex flex-col items-center gap-4 rounded-lg border p-4">

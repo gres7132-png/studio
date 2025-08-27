@@ -14,20 +14,20 @@ export function WithdrawForm({ currentBalance }: WithdrawFormProps) {
       <CardHeader>
         <CardTitle className="font-headline">Request a Withdrawal</CardTitle>
         <CardDescription>
-          Withdraw funds to your M-Pesa or Crypto wallet. Minimum withdrawal is $10.
+          Withdraw funds to your Airtel or Crypto wallet. Minimum withdrawal is Ksh 1000.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="withdraw-amount">Amount (USD)</Label>
-          <Input id="withdraw-amount" type="number" placeholder="e.g., 50" />
+          <Label htmlFor="withdraw-amount">Amount (KES)</Label>
+          <Input id="withdraw-amount" type="number" placeholder="e.g., 5000" />
           <p className="text-sm text-muted-foreground">
-            Available for withdrawal: ${currentBalance.toLocaleString()}
+            Available for withdrawal: Ksh {currentBalance.toLocaleString()}
           </p>
         </div>
         <div className="space-y-2">
           <Label htmlFor="withdraw-details">Withdrawal Details</Label>
-          <Input id="withdraw-details" placeholder="Enter your M-Pesa number or USDT address" />
+          <Input id="withdraw-details" placeholder="Enter your Airtel number or USDT address" />
         </div>
         <Button className="w-full" size="lg">Request Withdrawal</Button>
       </CardContent>

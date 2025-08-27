@@ -54,7 +54,7 @@ export default function CommissionsPage() {
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">
-              ${totalCommissions.toLocaleString()}
+              Ksh {totalCommissions.toLocaleString()}
             </p>
             <p className="mt-2 text-sm text-primary-foreground/80">
               From {referralsMade.length} referrals.
@@ -82,7 +82,7 @@ export default function CommissionsPage() {
                   <TableCell>
                     <div className="flex items-center gap-3">
                        <Avatar className="h-9 w-9">
-                         <AvatarImage src={`https://picsum.photos/seed/${ref.referredId}/100`} alt={ref.referred.name} data-ai-hint="profile picture" />
+                         
                          <AvatarFallback>{ref.referred.name.charAt(0)}</AvatarFallback>
                        </Avatar>
                        <div>
@@ -95,7 +95,7 @@ export default function CommissionsPage() {
                     {format(parseISO(ref.createdAt), 'PPP')}
                   </TableCell>
                   <TableCell className="text-right font-medium text-green-600">
-                    +${ref.commissionAmount.toLocaleString()}
+                    +Ksh {ref.commissionAmount.toLocaleString()}
                   </TableCell>
                 </TableRow>
               ))}

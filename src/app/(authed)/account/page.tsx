@@ -22,7 +22,7 @@ export default function AccountPage() {
         <CardHeader>
             <div className="flex items-center gap-4">
                 <Avatar className="h-20 w-20">
-                    <AvatarImage src={`https://picsum.photos/seed/${user.id}/100`} alt={user.name} data-ai-hint="profile picture" />
+                    
                     <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
