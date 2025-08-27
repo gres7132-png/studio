@@ -1,3 +1,4 @@
+
 import { allUsers } from "@/lib/data";
 import {
   Table,
@@ -59,19 +60,10 @@ export default function AdminUsersPage() {
                 <TableCell>Ksh {user.wallet.balance.toLocaleString()}</TableCell>
                 <TableCell>
                     <EditUserSheet user={user}>
-                        <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" className="h-8 w-8 p-0">
-                                    <span className="sr-only">Open menu</span>
-                                    <MoreHorizontal className="h-4 w-4" />
-                                </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent align="end">
-                                <DropdownMenuItem>Edit</DropdownMenuItem>
-                                <DropdownMenuItem>View Investments</DropdownMenuItem>
-                                <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                            </DropdownMenuContent>
-                        </DropdownMenu>
+                         <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                        </Button>
                     </EditUserSheet>
                 </TableCell>
               </TableRow>
