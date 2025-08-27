@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { distributorLevels } from "@/lib/data";
+import Link from "next/link";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function DividendsPage() {
 
@@ -17,6 +19,12 @@ export default function DividendsPage() {
                     View and manage your distributor dividends.
                 </p>
             </div>
+
+            <Alert>
+                <AlertDescription>
+                    Please note: Dividend releases may take up to 4 working days to process.
+                </AlertDescription>
+            </Alert>
 
             <div className="grid gap-6 md:grid-cols-2">
                 <Card className="shadow-md bg-red-600 text-white">
@@ -65,7 +73,9 @@ export default function DividendsPage() {
                                     <TableCell>{level.purchasedProducts}</TableCell>
                                     <TableCell>Ksh {level.deposit.toLocaleString()}</TableCell>
                                     <TableCell>
-                                        <Button variant="secondary" size="sm">Apply</Button>
+                                        <Button asChild size="sm" className="bg-green-600 hover:bg-green-700 text-white">
+                                            <Link href="/wallet">Apply</Link>
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}
