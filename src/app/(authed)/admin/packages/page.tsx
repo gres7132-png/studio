@@ -1,6 +1,6 @@
 
 'use client';
-import { packages } from "@/lib/data";
+import { packages as initialPackages } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -12,18 +12,43 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, PlusCircle } from "lucide-react";
+import { PlusCircle } from "lucide-react";
+import { EditPackageSheet } from "@/components/admin/edit-package-sheet";
+import { useState } from "react";
+import type { Package } from "@/lib/types";
 
 export default function AdminPackagesPage() {
+  const [packages, setPackages] = useState<Package[]>(initialPackages);
+
+  const handleSave = (newPackage: Package) => {
+    if(newPackage.id) {
+        setPackages(packages.map(p => p.id === newPackage.id ? newPackage : p))
+    } else {
+        // A real implementation would get a new ID from a database
+        const newId = Math.max(...packages.map(p => p.id)) + 1;
+        setPackages([...packages, {...newPackage, id: newId}]);
+    }
+  }
+
+  const handleDelete = (packageId: number) => {
+    setPackages(packages.filter(p => p.id !== packageId));
+  }
+
+  const handleToggleStatus = (packageId: number) => {
+      setPackages(packages.map(p => p.id === packageId ? {...p, isActive: !p.isActive} : p));
+  }
+
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between">
         <CardTitle>Marketing Packages</CardTitle>
-        <Button size="sm">
-            <PlusCircle className="mr-2 h-4 w-4" />
-            Add Package
-        </Button>
+        <EditPackageSheet onSave={handleSave}>
+            <Button size="sm">
+                <PlusCircle className="mr-2 h-4 w-4" />
+                Add Package
+            </Button>
+        </EditPackageSheet>
       </CardHeader>
       <CardContent>
         <Table>
@@ -50,19 +75,12 @@ export default function AdminPackagesPage() {
                   </Badge>
                 </TableCell>
                 <TableCell>
-                    <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" className="h-8 w-8 p-0">
-                                <span className="sr-only">Open menu</span>
-                                <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                            <DropdownMenuItem>Toggle Status</DropdownMenuItem>
-                            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
-                        </DropdownMenuContent>
-                    </DropdownMenu>
+                   <EditPackageSheet 
+                        pkg={pkg} 
+                        onSave={handleSave} 
+                        onDelete={handleDelete}
+                        onToggleStatus={handleToggleStatus}
+                    />
                 </TableCell>
               </TableRow>
             ))}
