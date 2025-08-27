@@ -48,18 +48,17 @@ export function SidebarNav({ user }: SidebarNavProps) {
         <SidebarGroupLabel>User Menu</SidebarGroupLabel>
         {navItems.map((item) => (
           <SidebarMenuItem key={item.href}>
-            <Link href={item.href} passHref>
-              <SidebarMenuButton
-                asChild
-                isActive={pathname === item.href}
-                tooltip={item.label}
-              >
-                <div>
-                  <item.icon />
-                  <span>{item.label}</span>
-                </div>
-              </SidebarMenuButton>
-            </Link>
+            <SidebarMenuButton
+              asChild
+              size="lg"
+              isActive={pathname === item.href}
+              tooltip={item.label}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
           </SidebarMenuItem>
         ))}
       </SidebarGroup>
@@ -70,18 +69,17 @@ export function SidebarNav({ user }: SidebarNavProps) {
             <SidebarGroupLabel>Admin</SidebarGroupLabel>
             {adminNavItems.map((item) => (
               <SidebarMenuItem key={item.href}>
-                <Link href={item.href} passHref>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname === item.href}
-                    tooltip={item.label}
-                  >
-                    <div>
-                      <item.icon />
-                      <span>{item.label}</span>
-                    </div>
-                  </SidebarMenuButton>
-                </Link>
+                <SidebarMenuButton
+                  asChild
+                  size="lg"
+                  isActive={pathname === item.href}
+                  tooltip={item.label}
+                >
+                  <Link href={item.href}>
+                    <item.icon />
+                    <span>{item.label}</span>
+                  </Link>
+                </SidebarMenuButton>
               </SidebarMenuItem>
             ))}
           </SidebarGroup>
@@ -90,3 +88,5 @@ export function SidebarNav({ user }: SidebarNavProps) {
     </SidebarMenu>
   );
 }
+
+    

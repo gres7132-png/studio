@@ -42,14 +42,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           <SidebarNav user={user} />
         </SidebarContent>
         <SidebarFooter>
-          <Link href="/login">
-            <Button variant="ghost" className="w-full justify-start gap-2">
-              <LogOut />
-              <span className="group-data-[collapsible=icon]:hidden">
-                Logout
-              </span>
-            </Button>
-          </Link>
+          <Button variant="ghost" className="w-full justify-start gap-2 text-base h-12" asChild>
+            <Link href="/login">
+                <LogOut />
+                <span className="group-data-[collapsible=icon]:hidden">
+                  Logout
+                </span>
+            </Link>
+          </Button>
         </SidebarFooter>
       </Sidebar>
       <SidebarInset>
@@ -90,3 +90,5 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     </SidebarProvider>
   );
 }
+
+    
