@@ -1,7 +1,10 @@
-import { getTodaysEarnings, mockUser, packages } from '@/lib/data';
+
+import { getTodaysEarnings, mockUser, packages, testimonials } from '@/lib/data';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { PackagesList } from '@/components/dashboard/packages-list';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
+import { TestimonialsCarousel } from '@/components/dashboard/testimonials-carousel';
+import { Separator } from '@/components/ui/separator';
 
 export default function DashboardPage() {
   const user = mockUser;
@@ -19,6 +22,18 @@ export default function DashboardPage() {
       </div>
 
       <StatsCards user={user} todaysEarnings={todaysEarnings} />
+      
+      <div>
+        <h2 className="text-xl font-headline font-bold md:text-2xl">
+          Community Activity
+        </h2>
+         <p className="text-muted-foreground mb-4">
+          See what other members are doing right now.
+        </p>
+        <TestimonialsCarousel testimonials={testimonials} />
+      </div>
+
+      <Separator />
 
       <div>
         <h2 className="text-xl font-headline font-bold md:text-2xl">
@@ -29,6 +44,8 @@ export default function DashboardPage() {
         </p>
         <PackagesList packages={packages} />
       </div>
+      
+      <Separator />
 
       <div>
         <h2 className="text-xl font-headline font-bold md:text-2xl">Recent Transactions</h2>

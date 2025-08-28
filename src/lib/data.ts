@@ -1,6 +1,6 @@
 
 import { differenceInHours, parseISO } from 'date-fns';
-import type { Package, User, DistributorLevel } from './types';
+import type { Package, User, DistributorLevel, Testimonial } from './types';
 
 // Data based on user request:
 // 1300 - receive daily 146 for 16days making a total of 2336.
@@ -91,4 +91,19 @@ export const allUsers: User[] = [
     transactions: [],
     referralsMade: [],
   },
+];
+
+export const testimonials: Testimonial[] = [
+  { id: 1, name: "John D.", location: "Nairobi, Kenya", message: "Just withdrew Ksh 5,595 earnings, this platform is amazing!", avatar: "JD" },
+  { id: 2, name: "Emily K.", location: "Mombasa, Kenya", message: "My Marketer Tier 1 package is already paying off. Great returns!", avatar: "EK" },
+  { id: 3, name: "David M.", location: "Kisumu, Kenya", message: "The deposit process with Airtel Money was so fast and easy.", avatar: "DM" },
+  { id: 4, name: "Sarah W.", location: "Nakuru, Kenya", message: "Just bought the Pro Marketer Tier 1 package. Excited for the returns!", avatar: "SW" },
+  { id: 5, name: "Michael O.", location: "Eldoret, Kenya", message: "Successfully withdrew my commissions. The referral program is top-notch.", avatar: "MO" },
+  { id: 6, name: "Fatima A.", location: "Garissa, Kenya", message: "Reached V2 Distributor level! The monthly dividends are a game changer.", avatar: "FA" },
+  { id: 7, name: "Peter N.", location: "Thika, Kenya", message: "Crypto deposit was smooth. I appreciate the modern options.", avatar: "PN" },
+  { id: 8, name: "Lucy G.", location: "Nyeri, Kenya", message: "Customer support was very helpful with my verification.", avatar: "LG" },
+  { id: 9, name: "Brian K.", location: "Machakos, Kenya", message: "Just received my daily return of Ksh 748, right on time.", avatar: "BK" },
+  { id: 10, name: "Grace L.", location: "Kakamega, Kenya", message: "I love how easy it is to track my investments on the dashboard.", avatar: "GL" },
+  { id: 11, name: "Kevin P.", location: "Meru, Kenya", message: "Just made my first investment. Let's go!", avatar: "KP" },
+  { id: 12, name: "Brenda A.", location: "Malindi, Kenya", message: "Withdrew my earnings to buy a new phone. Thank you!", avatar: "BA" },
 ];

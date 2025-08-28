@@ -72,3 +72,11 @@ export interface DistributorLevel {
   purchasedProducts: number;
   deposit: number;
 }
+
+export interface Testimonial {
+  id: number;
+  name: string;
+  location: string;
+  message: string;
+  avatar: string;
+}
