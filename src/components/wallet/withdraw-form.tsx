@@ -12,7 +12,7 @@ export function WithdrawForm({ currentBalance }: WithdrawFormProps) {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle className="font-headline">Request a Withdrawal</CardTitle>
+        <CardTitle className="font-headline font-bold">Request a Withdrawal</CardTitle>
         <CardDescription>
           Withdraw funds to your Airtel or Crypto wallet. Minimum withdrawal is Ksh 100. A 15% facilitation fee applies to all withdrawals.
         </CardDescription>

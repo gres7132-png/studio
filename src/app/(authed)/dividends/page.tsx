@@ -37,7 +37,7 @@ export default function DividendsPage() {
     return (
         <div className="space-y-8">
             <div>
-                <h1 className="text-2xl font-headline md:text-3xl">Company Dividends</h1>
+                <h1 className="text-2xl font-headline font-bold md:text-3xl">Company Dividends</h1>
                 <p className="text-muted-foreground">
                     View and manage your distributor dividends.
                 </p>
@@ -52,7 +52,7 @@ export default function DividendsPage() {
             <div className="grid gap-6 md:grid-cols-2">
                 <Card className="shadow-md bg-red-600 text-white">
                     <CardHeader>
-                        <CardTitle className="text-sm font-semibold">TOTAL DIVIDENDS</CardTitle>
+                        <CardTitle className="text-sm font-bold">TOTAL DIVIDENDS</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <p className="text-4xl font-bold">
@@ -62,7 +62,7 @@ export default function DividendsPage() {
                 </Card>
                  <Card className="shadow-md bg-green-500 text-white">
                     <CardHeader className="flex flex-row items-center justify-between">
-                        <CardTitle className="text-sm font-semibold">PENDING DIVIDENDS</CardTitle>
+                        <CardTitle className="text-sm font-bold">PENDING DIVIDENDS</CardTitle>
                          <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="secondary" size="sm" className="bg-white/20 hover:bg-white/30 text-white" disabled={pendingDividends === 0}>
@@ -95,7 +95,7 @@ export default function DividendsPage() {
 
             <Card className="shadow-md">
                 <CardHeader>
-                    <CardTitle className="font-headline">Distributor Levels</CardTitle>
+                    <CardTitle className="font-headline font-bold">Distributor Levels</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <Table>

@@ -19,7 +19,7 @@ export function DepositForm() {
   return (
     <Card className="shadow-md">
       <CardHeader>
-        <CardTitle className="font-headline">Make a Deposit</CardTitle>
+        <CardTitle className="font-headline font-bold">Make a Deposit</CardTitle>
         <CardDescription>
           Choose a payment method and enter the amount you wish to deposit.
         </CardDescription>
@@ -55,7 +55,7 @@ export function DepositForm() {
         {method === 'airtel' && (
           <div className="space-y-4">
             <Alert>
-              <AlertTitle className="font-headline">Airtel Money Instructions</AlertTitle>
+              <AlertTitle className="font-headline font-bold">Airtel Money Instructions</AlertTitle>
               <AlertDescription>
                 Send the exact amount to our Airtel number: <strong>0781309701</strong>.
                 <br/>
@@ -72,7 +72,7 @@ export function DepositForm() {
         {method === 'minipay' && (
             <div className="space-y-4">
                 <Alert>
-                <AlertTitle className="font-headline">MiniPay Instructions</AlertTitle>
+                <AlertTitle className="font-headline font-bold">MiniPay Instructions</AlertTitle>
                 <AlertDescription>
                     Click the link below to pay with MiniPay. The number <strong>0781309701</strong> can receive from MiniPay.
                 </AlertDescription>
@@ -89,7 +89,7 @@ export function DepositForm() {
         {method === 'crypto' && (
           <div className="space-y-4">
              <Alert>
-              <AlertTitle className="font-headline">Cryptocurrency (USDT) Payment</AlertTitle>
+              <AlertTitle className="font-headline font-bold">Cryptocurrency (USDT) Payment</AlertTitle>
               <AlertDescription>
                 Send the exact USDT amount to the wallet address below (Celo Network).
               </AlertDescription>

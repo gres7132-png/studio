@@ -34,7 +34,7 @@ export default function AccountPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-headline md:text-3xl">My Account</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">My Account</h1>
         <p className="text-muted-foreground">
           View and edit your personal information.
         </p>
@@ -47,7 +47,7 @@ export default function AccountPage() {
                     <AvatarFallback className="text-2xl">{user.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div>
-                    <CardTitle className="font-headline text-2xl">{user.name}</CardTitle>
+                    <CardTitle className="font-headline text-2xl font-bold">{user.name}</CardTitle>
                     <CardDescription>{user.email}</CardDescription>
                 </div>
             </div>
@@ -67,7 +67,7 @@ export default function AccountPage() {
             </form>
             <Separator />
              <form className="space-y-4" onSubmit={handlePasswordUpdate}>
-                <h3 className="text-lg font-medium font-headline">Change Password</h3>
+                <h3 className="text-lg font-headline font-bold">Change Password</h3>
                 <div className="space-y-2">
                     <Label htmlFor="current-password">Current Password</Label>
                     <Input id="current-password" type="password" />

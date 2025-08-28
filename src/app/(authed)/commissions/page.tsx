@@ -37,7 +37,7 @@ export default function CommissionsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-headline md:text-3xl">Agent Commissions</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">Agent Commissions</h1>
         <p className="text-muted-foreground">
           Track your referral earnings and grow your network.
         </p>
@@ -46,7 +46,7 @@ export default function CommissionsPage() {
       <div className="grid gap-6 md:grid-cols-2">
         <Card className="shadow-md">
           <CardHeader>
-            <CardTitle className="font-headline text-xl">Your Referral Link</CardTitle>
+            <CardTitle className="font-headline text-xl font-bold">Your Referral Link</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center space-x-2">
@@ -62,7 +62,7 @@ export default function CommissionsPage() {
         </Card>
         <Card className="shadow-md bg-gradient-to-r from-primary to-blue-800 text-primary-foreground">
           <CardHeader>
-            <CardTitle className="font-headline text-xl">Total Commission Earned</CardTitle>
+            <CardTitle className="font-headline text-xl font-bold">Total Commission Earned</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-4xl font-bold">
@@ -77,7 +77,7 @@ export default function CommissionsPage() {
 
       <Card className="shadow-md">
         <CardHeader>
-          <CardTitle className="font-headline text-xl">Referred Users</CardTitle>
+          <CardTitle className="font-headline text-xl font-bold">Referred Users</CardTitle>
         </CardHeader>
         <CardContent>
           <Table>

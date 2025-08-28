@@ -35,7 +35,7 @@ export default function InvestmentsPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-headline md:text-3xl">My Investments</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">My Investments</h1>
         <p className="text-muted-foreground">
           Track your marketing rights portfolio and earnings.
         </p>
@@ -47,7 +47,7 @@ export default function InvestmentsPage() {
             <Card key={inv.id} className="shadow-md transition-shadow hover:shadow-lg">
               <CardHeader className="flex flex-row items-start justify-between">
                 <div>
-                  <CardTitle className="font-headline text-xl">
+                  <CardTitle className="font-headline text-xl font-bold">
                     {inv.package.name}
                   </CardTitle>
                    <p className="text-sm text-muted-foreground">

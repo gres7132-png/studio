@@ -12,7 +12,7 @@ export default function WalletPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-headline md:text-3xl">My Wallet</h1>
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">My Wallet</h1>
         <p className="text-muted-foreground">
           Manage your funds, deposits, and withdrawals.
         </p>
@@ -20,7 +20,7 @@ export default function WalletPage() {
 
        <Card className="shadow-md">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Current Balance</CardTitle>
+                <CardTitle className="text-sm font-bold">Current Balance</CardTitle>
                 <WalletIcon className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
@@ -42,7 +42,7 @@ export default function WalletPage() {
       </Tabs>
       
        <div>
-        <h2 className="text-xl font-headline md:text-2xl">Wallet History</h2>
+        <h2 className="text-xl font-headline font-bold md:text-2xl">Wallet History</h2>
         <RecentTransactions transactions={transactions} />
       </div>
 

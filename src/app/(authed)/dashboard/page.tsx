@@ -10,7 +10,7 @@ export default function DashboardPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-2xl font-headline md:text-3xl">
+        <h1 className="text-2xl font-headline font-bold md:text-3xl">
           Welcome back, {user.name}!
         </h1>
         <p className="text-muted-foreground">
@@ -21,7 +21,7 @@ export default function DashboardPage() {
       <StatsCards user={user} todaysEarnings={todaysEarnings} />
 
       <div>
-        <h2 className="text-xl font-headline md:text-2xl">
+        <h2 className="text-xl font-headline font-bold md:text-2xl">
           Available Marketing Packages
         </h2>
         <p className="text-muted-foreground">
@@ -31,7 +31,7 @@ export default function DashboardPage() {
       </div>
 
       <div>
-        <h2 className="text-xl font-headline md:text-2xl">Recent Transactions</h2>
+        <h2 className="text-xl font-headline font-bold md:text-2xl">Recent Transactions</h2>
         <RecentTransactions transactions={user.transactions.slice(0, 5)} />
       </div>
     </div>

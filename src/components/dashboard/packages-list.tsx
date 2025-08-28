@@ -14,7 +14,7 @@ export function PackagesList({ packages }: PackagesListProps) {
       {packages.map((pkg) => (
         <Card key={pkg.id} className="flex flex-col overflow-hidden shadow-lg transition-transform hover:scale-105">
           <CardHeader>
-            <CardTitle className="font-headline text-xl">{pkg.name}</CardTitle>
+            <CardTitle className="font-headline text-xl font-bold">{pkg.name}</CardTitle>
              <div className="bg-primary text-primary-foreground px-3 py-1 rounded-full text-xs font-bold shadow-md self-start">
                 Ksh {pkg.price.toLocaleString()}
             </div>

@@ -8,6 +8,7 @@ import {
   SidebarGroup,
   SidebarGroupLabel,
   SidebarSeparator,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
@@ -44,6 +45,11 @@ const adminNavItems = [
 
 export function SidebarNav({ user }: SidebarNavProps) {
   const pathname = usePathname();
+  const { setOpenMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    setOpenMobile(false);
+  }
 
   return (
     <SidebarMenu>
@@ -56,10 +62,11 @@ export function SidebarNav({ user }: SidebarNavProps) {
               size="lg"
               isActive={pathname === item.href}
               tooltip={item.label}
+              onClick={handleLinkClick}
             >
               <Link href={item.href}>
                 <item.icon />
-                <span>{item.label}</span>
+                <span className="text-base font-medium">{item.label}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -77,10 +84,11 @@ export function SidebarNav({ user }: SidebarNavProps) {
                   size="lg"
                   isActive={pathname === item.href}
                   tooltip={item.label}
+                  onClick={handleLinkClick}
                 >
                   <Link href={item.href}>
                     <item.icon />
-                    <span>{item.label}</span>
+                    <span className="text-base font-medium">{item.label}</span>
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
