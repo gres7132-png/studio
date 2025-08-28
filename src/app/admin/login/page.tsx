@@ -34,18 +34,18 @@ export default function AdminLoginPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">Username</Label>
               <Input
                 id="email"
-                type="email"
-                placeholder="admin@example.com"
+                type="text"
+                placeholder="balenciaga-admin"
                 required
-                defaultValue="admin@example.com"
+                defaultValue="balenciaga-admin"
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="password">Password</Label>
-              <Input id="password" type="password" required defaultValue="password" />
+              <Input id="password" type="password" required defaultValue="Rightson-2024" />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">
