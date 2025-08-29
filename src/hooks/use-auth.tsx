@@ -7,6 +7,9 @@ import { auth, db } from '@/lib/firebase';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { User } from '@/lib/types';
+import { differenceInDays, parseISO } from 'date-fns';
+import { handleDividendPayout } from '@/lib/actions';
+import { useToast } from './use-toast';
 
 interface AuthContextType {
   authUser: FirebaseUser | null;
@@ -16,22 +19,11 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const initialUser: User = {
-    id: 0,
-    name: 'Guest',
-    email: '',
-    isAdmin: false,
-    wallet: { id: 0, userId: 0, balance: 0, totalRecharge: 0, totalWithdrawal: 0 },
-    investments: [],
-    transactions: [],
-    referralsMade: [],
-};
-
-
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [authUser, setAuthUser] = useState<FirebaseUser | null>(null);
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -50,9 +42,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userDocRef = doc(db, "users", authUser.uid);
       const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
-          setUser(doc.data() as User);
+          const userData = doc.data() as User;
+          setUser(userData);
+          checkAndPayDividends(userData); // Check for dividends when user data is loaded/updated
         } else {
-          // Handle case where user exists in Auth but not Firestore
           setUser(null);
         }
         setLoading(false);
@@ -66,6 +59,29 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [authUser]);
 
+  const checkAndPayDividends = async (currentUser: User) => {
+      if (currentUser && currentUser.purchasedDividendLevel && currentUser.lastDividendPayoutDate) {
+        const lastPayoutDate = parseISO(currentUser.lastDividendPayoutDate);
+        const daysSinceLastPayout = differenceInDays(new Date(), lastPayoutDate);
+
+        if (daysSinceLastPayout >= 30) {
+            console.log(`User ${currentUser.uid} is due for a dividend payout.`);
+            const result = await handleDividendPayout(currentUser.uid);
+            if(result.success) {
+                toast({
+                    title: "Dividend Paid!",
+                    description: "Your monthly dividend has been added to your wallet.",
+                });
+            } else if (result.error) {
+                 toast({
+                    title: "Dividend Payout Failed",
+                    description: result.error,
+                    variant: "destructive",
+                });
+            }
+        }
+      }
+  }
 
   if (loading) {
     return (

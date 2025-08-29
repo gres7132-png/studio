@@ -225,20 +225,22 @@ export async function handleDistributorshipPurchase(params: HandleDistributorshi
             }
             
             const now = new Date();
+            const nowISO = formatISO(now);
             const newTransaction: Omit<Transaction, 'id'> = {
                 userId: user.uid,
                 type: 'distributorship',
                 amount: levelData.purchasePrice,
                 status: 'success',
                 paymentMethod: `Purchase: ${levelData.level}`,
-                createdAt: formatISO(now),
+                createdAt: nowISO,
             };
 
             transaction.update(userDocRef, {
                 'wallet.balance': increment(-levelData.purchasePrice),
                 transactions: arrayUnion(newTransaction),
                 purchasedDividendLevel: levelData.level,
-                distributorshipPurchaseDate: formatISO(now)
+                distributorshipPurchaseDate: nowISO,
+                lastDividendPayoutDate: nowISO, // Set initial payout date
             });
         });
 
@@ -249,5 +251,56 @@ export async function handleDistributorshipPurchase(params: HandleDistributorshi
             return { success: false, error: error.message };
         }
         return { success: false, error: 'An unknown error occurred during the purchase process.' };
+    }
+}
+
+export async function handleDividendPayout(userId: string): Promise<{ success: boolean; error?: string }> {
+    if (!userId) {
+        return { success: false, error: 'User is not authenticated.' };
+    }
+
+    const userDocRef = doc(db, 'users', userId);
+    try {
+        await runTransaction(db, async (firestoreTransaction) => {
+            const userDoc = await firestoreTransaction.get(userDocRef);
+            if (!userDoc.exists() || !userDoc.data().purchasedDividendLevel) {
+                // This isn't an error, just means user isn't eligible.
+                return; 
+            }
+
+            const user = userDoc.data() as User;
+            const levelData = distributorLevels.find(l => l.level === user.purchasedDividendLevel);
+
+            if (!levelData || levelData.monthlyDividend <= 0) {
+                 return; // No dividend to pay out.
+            }
+            
+            const now = new Date();
+            const nowISO = formatISO(now);
+            const dividendAmount = levelData.monthlyDividend;
+
+            const newTransaction: Omit<Transaction, 'id'> = {
+                userId: user.uid,
+                type: 'dividend',
+                amount: dividendAmount,
+                status: 'success',
+                paymentMethod: `Monthly Payout: ${levelData.level}`,
+                createdAt: nowISO,
+            };
+
+            firestoreTransaction.update(userDocRef, {
+                'wallet.balance': increment(dividendAmount),
+                transactions: arrayUnion(newTransaction),
+                lastDividendPayoutDate: nowISO,
+            });
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Dividend payout error:', error);
+        if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: 'An unknown error occurred during the dividend payout.' };
     }
 }
