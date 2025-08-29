@@ -15,8 +15,9 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { auth, db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { doc, setDoc } from "firebase/firestore";
 
 export default function RegisterPage({
   searchParams,
@@ -36,16 +37,28 @@ export default function RegisterPage({
         setLoading(true);
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            await updateProfile(userCredential.user, {
+            const user = userCredential.user;
+            
+            // Update the user's profile in Firebase Auth
+            await updateProfile(user, {
                 displayName: name,
             });
-            // **DATABASE LOGIC NEEDED HERE**
-            // In a real application, you would make an API call to a server function here.
-            // This function would:
-            // 1. Create a 'users' document in your database (e.g., Firestore).
-            // 2. Save the user's name, email, mobile, and their new UID from `userCredential.user.uid`.
-            // 3. Check for a referrer ID in `searchParams.ref` and save it to the new user's document.
-            // 4. The user's own UID becomes their referral code for others to use.
+
+            // Create a new user document in Firestore
+            await setDoc(doc(db, "users", user.uid), {
+                uid: user.uid,
+                name: name,
+                email: email,
+                mobile: mobile,
+                isAdmin: false,
+                referredBy: searchParams.ref || null,
+                createdAt: new Date().toISOString(),
+                wallet: {
+                    balance: 0,
+                    totalRecharge: 0,
+                    totalWithdrawal: 0,
+                },
+            });
             
             toast({
                 title: "Account Created",
