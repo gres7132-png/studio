@@ -69,13 +69,6 @@ export interface Wallet {
   totalWithdrawal: number;
 }
 
-export interface DistributorLevel {
-  level: string;
-  monthlyDividend: number;
-  purchasedProducts: number;
-  deposit: number;
-}
-
 export interface Testimonial {
   id: number;
   name: string;

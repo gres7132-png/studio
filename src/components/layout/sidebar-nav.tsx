@@ -30,7 +30,6 @@ interface SidebarNavProps {}
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/investments', label: 'Investments', icon: Package },
-  { href: '/dividends', label: 'Company Dividends', icon: Landmark },
   { href: '/commissions', label: 'Commissions', icon: HandCoins },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/account', label: 'Account', icon: Settings },
