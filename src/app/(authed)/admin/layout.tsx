@@ -17,7 +17,7 @@ export default function AdminLayout({
 
     React.useEffect(() => {
         if (!loading && (!user || (user.email && !mockAdminEmails.includes(user.email)))) {
-           router.push('/admin/login');
+           router.push('/dashboard');
         }
     }, [user, loading, router]);
 

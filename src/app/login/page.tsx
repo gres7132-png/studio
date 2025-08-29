@@ -85,6 +85,9 @@ export default function LoginPage() {
                 Sign up
               </Link>
             </div>
+             <div className="mt-4 text-center text-xs text-muted-foreground">
+              Admins should sign up using their designated admin email and log in here.
+            </div>
           </CardFooter>
         </Card>
       </form>
