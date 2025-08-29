@@ -29,25 +29,6 @@ export const distributorLevels: DistributorLevel[] = [
     { level: 'V5', monthlyDividend: 108333, purchasedProducts: 6, deposit: 650000 },
 ];
 
-export const allUsers: Omit<User, 'id' | 'wallet' | 'investments' | 'transactions' | 'referralsMade'>[] = [
-  { name: 'Demo User', email: 'user@example.com', mobile: '+254712345678', isAdmin: true },
-  { name: 'Jane Doe', email: 'jane@example.com', mobile: '+254723456789', isAdmin: false },
-  { name: 'John Smith', email: 'john@example.com', mobile: '+254734567890', isAdmin: false },
-];
-
-
-export const getTodaysEarnings = (user: User) => {
-    const now = new Date();
-    return user.investments
-        .filter(inv => {
-            if (inv.status !== 'active') return false;
-            const investmentDate = parseISO(inv.createdAt);
-            const hoursSinceInvestment = differenceInHours(now, investmentDate);
-            return hoursSinceInvestment >= 24;
-        })
-        .reduce((total, inv) => total + inv.package.dailyReturn, 0);
-};
-
 export const testimonials: Testimonial[] = [
   { id: 1, name: "John D.", location: "Nairobi, Kenya", message: "Just withdrew Ksh 5,595 earnings, this platform is amazing!", avatar: "JD" },
   { id: 2, name: "Emily K.", location: "Mombasa, Kenya", message: "My Marketer Tier 1 package is already paying off. Great returns!", avatar: "EK" },
@@ -62,3 +43,20 @@ export const testimonials: Testimonial[] = [
   { id: 11, name: "Kevin P.", location: "Meru, Kenya", message: "Just made my first investment. Let's go!", avatar: "KP" },
   { id: 12, name: "Brenda A.", location: "Malindi, Kenya", message: "Withdrew my earnings to buy a new phone. Thank you!", avatar: "BA" },
 ];
+
+
+export const getTodaysEarnings = (user: User) => {
+    const now = new Date();
+    if (!user.investments) return 0;
+    
+    return user.investments
+        .filter(inv => {
+            if (inv.status !== 'active') return false;
+            // A simple check: if the investment was created at least 24 hours ago.
+            // A more robust solution would track the last payout date.
+            const investmentDate = parseISO(inv.createdAt);
+            const hoursSinceInvestment = differenceInHours(now, investmentDate);
+            return hoursSinceInvestment >= 24;
+        })
+        .reduce((total, inv) => total + inv.package.dailyReturn, 0);
+};

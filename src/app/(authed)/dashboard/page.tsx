@@ -49,7 +49,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-headline font-bold md:text-3xl">
-          Welcome back, {authUser?.displayName || 'User'}!
+          Welcome back, {user?.name || 'User'}!
         </h1>
         <p className="text-muted-foreground">
           Here&apos;s a summary of your account activity.
