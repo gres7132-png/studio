@@ -1,6 +1,6 @@
 
 'use client';
-import { allUsers as initialUsers } from "@/lib/data";
+import { allUsers as initialUsersData } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -15,25 +15,32 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EditUserSheet } from "@/components/admin/edit-user-sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { User } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot } from "firebase/firestore";
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<User[]>(initialUsers);
+    const [users, setUsers] = useState<User[]>([]);
+
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as User));
+            setUsers(usersData);
+        });
+        return () => unsubscribe();
+    }, []);
 
     const handleSave = (newUser: User) => {
-        if(newUser.id) {
+        // This would be handled by a server action or API route in a real app
+        // For now, we update the local state to see the change immediately
+        if(users.find(u => u.id === newUser.id)) {
             setUsers(users.map(u => u.id === newUser.id ? newUser : u));
         } else {
-             // A real implementation would get a new ID from a database
-            const newId = Math.max(...users.map(u => u.id)) + 1;
+            // A real implementation would get a new ID from a database
             const userWithId = {
                 ...newUser,
-                id: newId,
-                wallet: { id: newId, userId: newId, balance: 0, totalRecharge: 0, totalWithdrawal: 0 },
-                investments: [],
-                transactions: [],
-                referralsMade: [],
+                id: Math.random(), // temporary ID
             };
             setUsers([...users, userWithId]);
         }

@@ -1,6 +1,5 @@
 
 'use client';
-import { mockUser } from '@/lib/data'; // Still using some mock data for display
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -17,15 +16,15 @@ import { format, parseISO } from 'date-fns';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/hooks/use-auth';
+import type { Referral } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CommissionsPage() {
-  const { user } = useAuth();
-  // Display data is still mocked until database is connected.
-  const { referralsMade } = mockUser; 
+  const { user, authUser } = useAuth();
   const { toast } = useToast();
   
-  // The referral link is now dynamically generated based on the logged-in user's UID.
-  const referralLink = user ? `https://app.balenciaga-rights.com/register?ref=${user.uid}` : '';
+  const referralsMade: Referral[] = user?.referralsMade || [];
+  const referralLink = authUser ? `https://app.balenciaga-rights.com/register?ref=${authUser.uid}` : '';
   
   const totalCommissions = referralsMade.reduce(
     (sum, ref) => sum + ref.commissionAmount,
@@ -42,7 +41,21 @@ export default function CommissionsPage() {
     }
   }
   
-  if (!user) return null;
+  if (!user || !authUser) {
+    return (
+       <div className="space-y-8">
+        <div>
+          <Skeleton className="h-8 w-64" />
+          <Skeleton className="h-4 w-80 mt-2" />
+        </div>
+         <div className="grid gap-6 md:grid-cols-2">
+            <Skeleton className="h-40 w-full" />
+            <Skeleton className="h-40 w-full" />
+         </div>
+         <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

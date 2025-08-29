@@ -1,13 +1,31 @@
+
+'use client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockUser } from '@/lib/data';
 import { DepositForm } from '@/components/wallet/deposit-form';
 import { WithdrawForm } from '@/components/wallet/withdraw-form';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet as WalletIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function WalletPage() {
-  const { wallet, transactions } = mockUser;
+  const { user } = useAuth();
+
+  if (!user) {
+    return (
+       <div className="space-y-8">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64 mt-2" />
+        </div>
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  const { wallet, transactions } = user;
 
   return (
     <div className="space-y-8">

@@ -1,4 +1,5 @@
-import { mockUser } from '@/lib/data';
+
+'use client';
 import {
   Card,
   CardContent,
@@ -8,9 +9,30 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { differenceInDays, format, parseISO } from 'date-fns';
+import { useAuth } from '@/hooks/use-auth';
+import type { Investment } from '@/lib/types';
+import { Skeleton } from '@/components/ui/skeleton';
+
 
 export default function InvestmentsPage() {
-  const { investments } = mockUser;
+  const { user } = useAuth();
+
+  if (!user) {
+      return (
+          <div className="space-y-8">
+              <div>
+                <Skeleton className="h-8 w-48" />
+                <Skeleton className="h-4 w-64 mt-2" />
+              </div>
+              <div className="space-y-6">
+                <Skeleton className="h-40 w-full" />
+                <Skeleton className="h-40 w-full" />
+              </div>
+          </div>
+      )
+  }
+  
+  const investments: Investment[] = user.investments;
 
   const calculateProgress = (startDate: string, endDate: string) => {
     const start = parseISO(startDate);

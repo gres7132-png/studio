@@ -7,14 +7,42 @@ import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { TestimonialsCarousel } from '@/components/dashboard/testimonials-carousel';
 import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
-import { mockUser, getTodaysEarnings } from '@/lib/data'; // Still need some mock data for now
+import { getTodaysEarnings } from '@/lib/data'; 
+import { Skeleton } from '@/components/ui/skeleton';
 
 export default function DashboardPage() {
-  const { user: authUser } = useAuth();
+  const { authUser, user } = useAuth();
   
-  // We'll continue to use some mock data for parts of the dashboard
-  // until the database is fully integrated.
-  const user = mockUser;
+  if (!user || !authUser) {
+    return (
+      <div className="space-y-8">
+          <div>
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-4 w-3/4 mt-2" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+          </div>
+          <div>
+            <Skeleton className="h-8 w-1/3 mb-4" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <Separator />
+           <div>
+            <Skeleton className="h-8 w-1/3 mb-4" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-64" />
+              <Skeleton className="h-64" />
+              <Skeleton className="h-64" />
+            </div>
+          </div>
+      </div>
+    );
+  }
+
   const todaysEarnings = getTodaysEarnings(user);
 
   return (
