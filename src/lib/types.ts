@@ -1,14 +1,18 @@
 
+
 export interface User {
-  id: number;
+  uid: string; // Firebase Auth UID
   name: string;
   email: string;
   mobile?: string;
   isAdmin: boolean;
+  referredBy?: string | null;
+  createdAt: string;
   wallet: Wallet;
   investments: Investment[];
   transactions: Transaction[];
   referralsMade: Referral[];
+  id?: string; // Firestore document ID
 }
 
 export interface Package {
@@ -25,7 +29,7 @@ export interface Package {
 
 export interface Investment {
   id: number;
-  userId: number;
+  userId: string;
   packageId: number;
   package: Package;
   amount: number;
@@ -37,8 +41,8 @@ export interface Investment {
 }
 
 export interface Transaction {
-  id: number;
-  userId: number;
+  id?: number;
+  userId: string;
   type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout';
   amount: number;
   status: 'success' | 'pending' | 'failed';
@@ -48,8 +52,8 @@ export interface Transaction {
 
 export interface Referral {
   id: number;
-  referrerId: number;
-  referredId: number;
+  referrerId: string;
+  referredId: string;
   referred: {
     name: string;
     email: string;
@@ -59,8 +63,6 @@ export interface Referral {
 }
 
 export interface Wallet {
-  id: number;
-  userId: number;
   balance: number;
   totalRecharge: number;
   totalWithdrawal: number;

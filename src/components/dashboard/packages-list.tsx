@@ -1,14 +1,53 @@
+
+'use client';
+
 import type { Package } from '@/lib/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
+import { handleInvestment } from '@/lib/actions';
+import { useState } from 'react';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 interface PackagesListProps {
   packages: Package[];
 }
 
 export function PackagesList({ packages }: PackagesListProps) {
+    const { authUser } = useAuth();
+    const { toast } = useToast();
+    const [loadingPackageId, setLoadingPackageId] = useState<number | null>(null);
+
+    const onPurchase = async (pkg: Package) => {
+        if (!authUser) {
+            toast({ title: "Please log in to make a purchase.", variant: "destructive" });
+            return;
+        }
+
+        setLoadingPackageId(pkg.id);
+        const result = await handleInvestment({
+            userId: authUser.uid,
+            packageId: pkg.id,
+        });
+
+        if (result.success) {
+            toast({
+                title: "Purchase Successful!",
+                description: `You have successfully purchased the ${pkg.name} package.`,
+            });
+        } else {
+            toast({
+                title: "Purchase Failed",
+                description: result.error,
+                variant: "destructive",
+            });
+        }
+        setLoadingPackageId(null);
+    }
+
+
   return (
     <div className="mt-4 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
       {packages.map((pkg) => (
@@ -35,11 +74,28 @@ export function PackagesList({ packages }: PackagesListProps) {
             </div>
           </CardContent>
           <CardFooter>
-            <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" asChild>
-              <Link href="/wallet">
-                Purchase Rights <ArrowRight className="ml-2 h-4 w-4" />
-              </Link>
-            </Button>
+             <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={loadingPackageId === pkg.id}>
+                        {loadingPackageId === pkg.id ? 'Processing...' : 'Purchase Rights'}
+                        <ArrowRight className="ml-2 h-4 w-4" />
+                    </Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                    <AlertDialogTitle>Confirm Purchase</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Are you sure you want to purchase the "{pkg.name}" package for Ksh {pkg.price.toLocaleString()}? This amount will be deducted from your wallet balance.
+                    </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction onClick={() => onPurchase(pkg)}>
+                        Confirm Purchase
+                    </AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialog>
           </CardFooter>
         </Card>
       ))}
