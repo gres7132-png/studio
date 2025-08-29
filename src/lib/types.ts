@@ -18,7 +18,7 @@ export interface User {
 
 export interface Package {
   id: string; // Firestore document ID
-  name: string;
+  name:string;
   description: string;
   price: number;
   dailyReturn: number;
@@ -75,4 +75,11 @@ export interface Testimonial {
   location: string;
   message: string;
   avatar: string;
+}
+
+export interface DistributorLevel {
+  level: string;
+  referralsNeeded: number;
+  monthlyDividend: number;
+  requiredTeamSize: number;
 }

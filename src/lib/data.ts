@@ -1,15 +1,6 @@
 
 import { differenceInHours, parseISO } from 'date-fns';
-import type { User, Testimonial, Package } from './types';
-
-// Data based on user request:
-// 1300 - receive daily 146 for 16days making a total of 2336.
-// 2800 receive 373daily for 15days making a total of 5595.
-// 3900 receive 212 daily for 35 days a total of 7420.
-// 9750 receives 278 daily for 70days making 19460.
-// 20800 makes 436 daily for 130 days making 56680 in total.
-// 39000 makes 748 for 200 days tataling to 149600.
-// 65000 makes 1000 daily for 260 days making 260000.
+import type { User, Testimonial, Package, DistributorLevel } from './types';
 
 // This data is now managed in Firestore. This is kept as a reference or for initial seeding.
 export const packages: Package[] = [
@@ -37,6 +28,13 @@ export const testimonials: Testimonial[] = [
   { id: 12, name: "Brenda A.", location: "Malindi, Kenya", message: "Withdrew my earnings to buy a new phone. Thank you!", avatar: "BA" },
 ];
 
+export const distributorLevels: DistributorLevel[] = [
+  { level: "V1", referralsNeeded: 0, monthlyDividend: 0, requiredTeamSize: 0 },
+  { level: "V2", referralsNeeded: 10, monthlyDividend: 1000, requiredTeamSize: 30 },
+  { level: "V3", referralsNeeded: 20, monthlyDividend: 4000, requiredTeamSize: 60 },
+  { level: "V4", referralsNeeded: 50, monthlyDividend: 10000, requiredTeamSize: 150 },
+  { level: "V5", referralsNeeded: 100, monthlyDividend: 30000, requiredTeamSize: 300 },
+];
 
 export const getTodaysEarnings = (user: User) => {
     const now = new Date();
@@ -52,4 +50,30 @@ export const getTodaysEarnings = (user: User) => {
             return hoursSinceInvestment >= 24;
         })
         .reduce((total, inv) => total + inv.package.dailyReturn, 0);
+};
+
+export const getDistributorLevel = (user: User): {
+    currentLevel: DistributorLevel, 
+    nextLevel: DistributorLevel | null,
+    progress: number
+} => {
+    const referralCount = user.referralsMade?.length || 0;
+    
+    // Sort levels by referrals needed in descending order to find the current level
+    const sortedLevels = [...distributorLevels].sort((a, b) => b.referralsNeeded - a.referralsNeeded);
+    const currentLevel = sortedLevels.find(level => referralCount >= level.referralsNeeded) || distributorLevels[0];
+
+    // Find the next level
+    const nextLevel = distributorLevels.find(level => referralCount < level.referralsNeeded) || null;
+    
+    let progress = 0;
+    if (nextLevel) {
+        const referralsForCurrent = currentLevel?.referralsNeeded || 0;
+        const referralsForNext = nextLevel.referralsNeeded;
+        progress = ((referralCount - referralsForCurrent) / (referralsForNext - referralsForCurrent)) * 100;
+    } else {
+        progress = 100; // Max level reached
+    }
+
+    return { currentLevel, nextLevel, progress: Math.max(0, Math.min(progress, 100)) };
 };

@@ -31,6 +31,7 @@ const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/investments', label: 'Investments', icon: Package },
   { href: '/commissions', label: 'Commissions', icon: HandCoins },
+  { href: '/dividends', label: 'Company Dividends', icon: Landmark },
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/account', label: 'Account', icon: Settings },
 ];
