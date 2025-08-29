@@ -1,6 +1,5 @@
 
 'use client';
-import type { User } from '@/lib/types';
 import {
   SidebarMenu,
   SidebarMenuItem,
@@ -23,10 +22,10 @@ import {
   Settings,
   Landmark,
 } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '../ui/skeleton';
 
-interface SidebarNavProps {
-  user: User;
-}
+interface SidebarNavProps {}
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -37,18 +36,37 @@ const navItems = [
   { href: '/account', label: 'Account', icon: Settings },
 ];
 
+// This is a placeholder. In a real app, you'd fetch this from your database.
+const mockAdminEmails = ['admin@example.com', 'balenciaga-admin@example.com'];
+
 const adminNavItems = [
   { href: '/admin/dashboard', label: 'Admin Dashboard', icon: Shield },
   { href: '/admin/packages', label: 'Manage Packages', icon: Package },
   { href: '/admin/users', label: 'Manage Users', icon: UserCog },
 ];
 
-export function SidebarNav({ user }: SidebarNavProps) {
+export function SidebarNav({}: SidebarNavProps) {
   const pathname = usePathname();
   const { setOpenMobile } = useSidebar();
+  const { user, loading } = useAuth();
+  
+  // A real implementation would check a user's role from a database.
+  // For now, we'll check against a hardcoded list of admin emails.
+  const isAdmin = user?.email ? mockAdminEmails.includes(user.email) : false;
 
   const handleLinkClick = () => {
     setOpenMobile(false);
+  }
+
+  if (loading) {
+    return (
+        <div className="p-2 space-y-2">
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+            <Skeleton className="h-10 w-full" />
+        </div>
+    )
   }
 
   return (
@@ -72,7 +90,7 @@ export function SidebarNav({ user }: SidebarNavProps) {
           </SidebarMenuItem>
         ))}
       </SidebarGroup>
-      {user.isAdmin && (
+      {isAdmin && (
         <>
           <SidebarSeparator />
           <SidebarGroup>

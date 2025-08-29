@@ -1,12 +1,19 @@
 
-import { getTodaysEarnings, mockUser, packages, testimonials } from '@/lib/data';
+'use client';
+import { packages, testimonials } from '@/lib/data';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { PackagesList } from '@/components/dashboard/packages-list';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { TestimonialsCarousel } from '@/components/dashboard/testimonials-carousel';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/use-auth';
+import { mockUser, getTodaysEarnings } from '@/lib/data'; // Still need some mock data for now
 
 export default function DashboardPage() {
+  const { user: authUser } = useAuth();
+  
+  // We'll continue to use some mock data for parts of the dashboard
+  // until the database is fully integrated.
   const user = mockUser;
   const todaysEarnings = getTodaysEarnings(user);
 
@@ -14,7 +21,7 @@ export default function DashboardPage() {
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-headline font-bold md:text-3xl">
-          Welcome back, {user.name}!
+          Welcome back, {authUser?.displayName || 'User'}!
         </h1>
         <p className="text-muted-foreground">
           Here&apos;s a summary of your account activity.

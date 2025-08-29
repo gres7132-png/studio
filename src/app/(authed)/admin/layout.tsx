@@ -1,17 +1,30 @@
 
-import { mockUser } from "@/lib/data";
-import { redirect } from "next/navigation";
+'use client';
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import React from "react";
+
+// This is a placeholder. In a real app, you'd fetch this from your database.
+const mockAdminEmails = ['admin@example.com', 'balenciaga-admin@example.com'];
 
 export default function AdminLayout({
     children,
 }: {
     children: React.ReactNode
 }) {
-    const user = mockUser;
+    const { user, loading } = useAuth();
+    const router = useRouter();
 
-    if (!user.isAdmin) {
-       redirect('/admin/login');
+    React.useEffect(() => {
+        if (!loading && (!user || (user.email && !mockAdminEmails.includes(user.email)))) {
+           router.push('/admin/login');
+        }
+    }, [user, loading, router]);
+
+    if (loading || !user || (user.email && !mockAdminEmails.includes(user.email))) {
+        return <div className="flex justify-center items-center h-screen">Loading...</div>;
     }
+
 
     return (
         <div className="space-y-8">

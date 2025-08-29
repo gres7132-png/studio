@@ -1,6 +1,6 @@
 
 'use client';
-import { mockUser } from '@/lib/data';
+import { mockUser } from '@/lib/data'; // Still using some mock data
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,12 +14,14 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { format, parseISO } from 'date-fns';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/hooks/use-auth';
 
 export default function CommissionsPage() {
-  const { referralsMade, id } = mockUser;
-  const referralLink = `https://app.balenciaga-rights.com/register?ref=${id}`;
+  const { user } = useAuth();
+  const { referralsMade } = mockUser; // Still using some mock data
+  const referralLink = user ? `https://app.balenciaga-rights.com/register?ref=${user.uid}` : '';
   const totalCommissions = referralsMade.reduce(
     (sum, ref) => sum + ref.commissionAmount,
     0
@@ -33,6 +35,8 @@ export default function CommissionsPage() {
       description: "Your referral link has been copied.",
     });
   }
+  
+  if (!user) return null;
 
   return (
     <div className="space-y-8">

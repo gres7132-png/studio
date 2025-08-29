@@ -1,3 +1,5 @@
+
+'use client';
 import * as React from 'react';
 import {
   SidebarProvider,
@@ -8,7 +10,6 @@ import {
   SidebarContent,
   SidebarFooter,
 } from '@/components/ui/sidebar';
-import { mockUser } from '@/lib/data';
 import { SidebarNav } from '@/components/layout/sidebar-nav';
 import { Button } from '@/components/ui/button';
 import { LogOut, User as UserIcon } from 'lucide-react';
@@ -21,11 +22,32 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Logo } from '@/components/icons';
+import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { auth } from '@/lib/firebase';
+import { useRouter } from 'next/navigation';
 
-export default function AppLayout({ children }: { children: React.ReactNode }) {
-  const user = mockUser;
+function AppLayoutContent({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    if (!user) {
+      router.push('/login');
+    }
+  }, [user, router]);
+  
+  const handleLogout = async () => {
+    await auth.signOut();
+    router.push('/login');
+  };
+
+  if (!user) {
+    return null; // Or a loading spinner
+  }
+
+  const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
 
   return (
     <SidebarProvider>
@@ -39,16 +61,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarNav user={user} />
+          <SidebarNav />
         </SidebarContent>
         <SidebarFooter>
-          <Button variant="ghost" className="w-full justify-start gap-2 text-base h-12" asChild>
-            <Link href="/login">
-                <LogOut />
-                <span className="group-data-[collapsible=icon]:hidden">
-                  Logout
-                </span>
-            </Link>
+          <Button variant="ghost" className="w-full justify-start gap-2 text-base h-12" onClick={handleLogout}>
+              <LogOut />
+              <span className="group-data-[collapsible=icon]:hidden">
+                Logout
+              </span>
           </Button>
         </SidebarFooter>
       </Sidebar>
@@ -60,15 +80,14 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
-                  
-                  <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                  <AvatarFallback>{userInitial}</AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className='font-normal'>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.name}</p>
+                  <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user.email}
                   </p>
@@ -79,8 +98,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 <Link href="/account"><UserIcon className='mr-2 size-4' />Account</Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                 <Link href="/login"><LogOut className='mr-2 size-4' />Log out</Link>
+              <DropdownMenuItem onClick={handleLogout}>
+                 <LogOut className='mr-2 size-4' />Log out
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -91,4 +110,11 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   );
 }
 
-    
+
+export default function AppLayout({ children }: { children: React.ReactNode }) {
+    return (
+        <AuthProvider>
+            <AppLayoutContent>{children}</AppLayoutContent>
+        </AuthProvider>
+    )
+}
