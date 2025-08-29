@@ -14,6 +14,8 @@ export interface User {
   referralsMade: Referral[];
   id?: string; // Firestore document ID
   hasInvested?: boolean; // To track first investment for commission
+  purchasedDividendLevel?: string;
+  distributorshipPurchaseDate?: string;
 }
 
 export interface Package {
@@ -44,7 +46,7 @@ export interface Investment {
 export interface Transaction {
   id?: string; // Firestore document ID or a generated string
   userId: string;
-  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout';
+  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout' | 'distributorship';
   amount: number;
   status: 'success' | 'pending' | 'failed';
   paymentMethod: string;
@@ -82,4 +84,5 @@ export interface DistributorLevel {
   referralsNeeded: number;
   monthlyDividend: number;
   requiredTeamSize: number;
+  purchasePrice: number;
 }

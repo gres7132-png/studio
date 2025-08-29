@@ -1,4 +1,5 @@
 
+
 import { differenceInHours, parseISO } from 'date-fns';
 import type { User, Testimonial, Package, DistributorLevel } from './types';
 
@@ -29,11 +30,11 @@ export const testimonials: Testimonial[] = [
 ];
 
 export const distributorLevels: DistributorLevel[] = [
-  { level: "V1", referralsNeeded: 0, monthlyDividend: 0, requiredTeamSize: 0 },
-  { level: "V2", referralsNeeded: 10, monthlyDividend: 1000, requiredTeamSize: 30 },
-  { level: "V3", referralsNeeded: 20, monthlyDividend: 4000, requiredTeamSize: 60 },
-  { level: "V4", referralsNeeded: 50, monthlyDividend: 10000, requiredTeamSize: 150 },
-  { level: "V5", referralsNeeded: 100, monthlyDividend: 30000, requiredTeamSize: 300 },
+  { level: "V1", referralsNeeded: 0, monthlyDividend: 0, requiredTeamSize: 0, purchasePrice: 0 },
+  { level: "V2", referralsNeeded: 10, monthlyDividend: 1000, requiredTeamSize: 30, purchasePrice: 1000 },
+  { level: "V3", referralsNeeded: 20, monthlyDividend: 4000, requiredTeamSize: 60, purchasePrice: 4000 },
+  { level: "V4", referralsNeeded: 50, monthlyDividend: 10000, requiredTeamSize: 150, purchasePrice: 10000 },
+  { level: "V5", referralsNeeded: 100, monthlyDividend: 30000, requiredTeamSize: 300, purchasePrice: 30000 },
 ];
 
 export const getTodaysEarnings = (user: User) => {

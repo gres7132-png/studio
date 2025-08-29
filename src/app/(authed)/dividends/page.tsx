@@ -6,11 +6,39 @@ import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { distributorLevels, getDistributorLevel } from '@/lib/data';
 import { useAuth } from '@/hooks/use-auth';
-import { Trophy } from 'lucide-react';
+import { Trophy, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import { useState } from 'react';
+import { handleDistributorshipPurchase } from '@/lib/actions';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
 
 export default function DividendsPage() {
-  const { user } = useAuth();
+  const { user, authUser } = useAuth();
+  const { toast } = useToast();
+  const [loadingLevel, setLoadingLevel] = useState<string | null>(null);
+
+  const handlePurchase = async (level: string) => {
+    if (!authUser) return;
+    setLoadingLevel(level);
+
+    const result = await handleDistributorshipPurchase({ userId: authUser.uid, level });
+
+    if (result.success) {
+      toast({
+        title: "Purchase Successful",
+        description: `You have successfully purchased the ${level} distributorship.`,
+      });
+    } else {
+      toast({
+        title: "Purchase Failed",
+        description: result.error,
+        variant: "destructive",
+      });
+    }
+    setLoadingLevel(null);
+  };
 
   if (!user) {
     return (
@@ -36,7 +64,7 @@ export default function DividendsPage() {
       <div>
         <h1 className="text-2xl font-headline font-bold md:text-3xl">Company Dividends</h1>
         <p className="text-muted-foreground">
-          Advance through distributor levels by growing your team and earn monthly rewards.
+          Unlock exclusive distributorship levels by growing your team. Purchase your unlocked tier to start earning monthly dividends.
         </p>
       </div>
       
@@ -53,9 +81,14 @@ export default function DividendsPage() {
             <p className="text-muted-foreground">
               You have <span className="font-bold text-foreground">{referralCount}</span> direct referrals.
             </p>
-            <p className="text-lg">
-              Monthly Dividend: <span className="font-bold text-green-600">Ksh {currentLevel.monthlyDividend.toLocaleString()}</span>
-            </p>
+             {user.purchasedDividendLevel ? (
+                <div className="flex items-center gap-2 text-green-600 font-semibold pt-2">
+                    <CheckCircle2 />
+                    <span>{user.purchasedDividendLevel} Distributorship Active</span>
+                </div>
+            ) : (
+                <p className="text-sm text-muted-foreground pt-2">You have not purchased a distributorship yet.</p>
+            )}
           </CardContent>
         </Card>
         
@@ -92,35 +125,73 @@ export default function DividendsPage() {
         <CardHeader>
           <CardTitle className="font-headline text-xl font-bold">Distributor Levels & Rewards</CardTitle>
           <CardDescription>
-            Each level has specific requirements for direct referrals and team size.
+            Once you meet the referral requirement for a level, you can purchase the distributorship to start earning monthly dividends. You can only purchase one distributorship.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {distributorLevels.map((level) => (
-            <Card key={level.level} className={cn(
-                "p-4 transition-all",
-                level.level === currentLevel.level ? 'border-primary ring-2 ring-primary shadow-lg' : 'border-border'
-            )}>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 items-center">
-                <div className="font-bold text-lg text-primary">{level.level}</div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Direct Referrals</div>
-                  <div className="font-semibold">{level.referralsNeeded}</div>
+          {distributorLevels.map((level) => {
+            const isUnlocked = referralCount >= level.referralsNeeded;
+            const isPurchased = user.purchasedDividendLevel === level.level;
+            const canPurchase = isUnlocked && !user.purchasedDividendLevel && level.purchasePrice > 0;
+
+            return (
+                <Card key={level.level} className={cn(
+                    "p-4 transition-all",
+                    level.level === user.purchasedDividendLevel ? 'border-primary ring-2 ring-primary shadow-lg' : 'border-border'
+                )}>
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 items-center">
+                    <div className="font-bold text-lg text-primary">{level.level}</div>
+                    <div>
+                    <div className="text-sm text-muted-foreground">Direct Referrals</div>
+                    <div className="font-semibold">{level.referralsNeeded}</div>
+                    </div>
+                    <div>
+                    <div className="text-sm text-muted-foreground">Purchase Price</div>
+                    <div className="font-semibold">Ksh {level.purchasePrice.toLocaleString()}</div>
+                    </div>
+                    <div>
+                    <div className="text-sm text-muted-foreground">Monthly Dividend</div>
+                    <div className="font-semibold text-green-600">Ksh {level.monthlyDividend.toLocaleString()}</div>
+                    </div>
+                    <div className="col-span-2 md:col-span-1 flex justify-end">
+                        {isPurchased ? (
+                            <div className="flex items-center gap-2 text-green-600 font-semibold text-sm">
+                                <CheckCircle2 />
+                                <span>Purchased</span>
+                            </div>
+                        ) : canPurchase ? (
+                            <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                    <Button size="sm" disabled={loadingLevel === level.level}>
+                                        {loadingLevel === level.level ? "Processing..." : "Purchase"}
+                                    </Button>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                    <AlertDialogHeader>
+                                    <AlertDialogTitle>Confirm Purchase</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                        Are you sure you want to purchase the "{level.level}" distributorship for Ksh {level.purchasePrice.toLocaleString()}? This amount will be deducted from your wallet balance.
+                                    </Aler tDialogDescription>
+                                    </AlertDialogHeader>
+                                    <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction onClick={() => handlePurchase(level.level)}>
+                                        Confirm Purchase
+                                    </AlertDialogAction>
+                                    </AlertDialogFooter>
+                                </AlertDialogContent>
+                            </AlertDialog>
+                        ) : (
+                           <Button size="sm" variant="outline" disabled>
+                            {isUnlocked ? "Unavailable" : "Locked"}
+                          </Button>
+                        )}
+                    </div>
                 </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Required Team Size</div>
-                  <div className="font-semibold">{level.requiredTeamSize}</div>
-                </div>
-                <div>
-                  <div className="text-sm text-muted-foreground">Monthly Dividend</div>
-                  <div className="font-semibold text-green-600">Ksh {level.monthlyDividend.toLocaleString()}</div>
-                </div>
-              </div>
-            </Card>
-          ))}
+                </Card>
+            )})}
         </CardContent>
       </Card>
-
     </div>
   );
 }

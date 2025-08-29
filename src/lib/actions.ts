@@ -3,8 +3,9 @@
 
 import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from './firebase';
-import type { User, Transaction, Investment, Package, Referral } from './types';
+import type { User, Transaction, Investment, Package, Referral, DistributorLevel } from './types';
 import { addDays, formatISO } from 'date-fns';
+import { distributorLevels } from './data';
 
 
 interface HandleTransactionParams {
@@ -182,5 +183,71 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
             return { success: false, error: error.message };
         }
         return { success: false, error: 'An unknown error occurred during the investment process.' };
+    }
+}
+
+
+interface HandleDistributorshipPurchaseParams {
+    userId: string;
+    level: string;
+}
+
+export async function handleDistributorshipPurchase(params: HandleDistributorshipPurchaseParams): Promise<{ success: boolean; error?: string }> {
+    const { userId, level } = params;
+    
+    if (!userId) {
+        return { success: false, error: 'User is not authenticated.' };
+    }
+
+    const userDocRef = doc(db, 'users', userId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const userDoc = await transaction.get(userDocRef);
+            if (!userDoc.exists()) {
+                throw new Error("User not found.");
+            }
+            
+            const user = userDoc.data() as User;
+            const levelData = distributorLevels.find(l => l.level === level);
+
+            if (!levelData) {
+                throw new Error("Invalid distributor level selected.");
+            }
+             if ((user.referralsMade?.length || 0) < levelData.referralsNeeded) {
+                throw new Error("You have not met the referral requirements for this level.");
+            }
+            if (user.purchasedDividendLevel) {
+                throw new Error("You have already purchased a distributorship level.");
+            }
+            if (user.wallet.balance < levelData.purchasePrice) {
+                throw new Error("Insufficient wallet balance for this purchase.");
+            }
+            
+            const now = new Date();
+            const newTransaction: Omit<Transaction, 'id'> = {
+                userId: user.uid,
+                type: 'distributorship',
+                amount: levelData.purchasePrice,
+                status: 'success',
+                paymentMethod: `Purchase: ${levelData.level}`,
+                createdAt: formatISO(now),
+            };
+
+            transaction.update(userDocRef, {
+                'wallet.balance': increment(-levelData.purchasePrice),
+                transactions: arrayUnion(newTransaction),
+                purchasedDividendLevel: levelData.level,
+                distributorshipPurchaseDate: formatISO(now)
+            });
+        });
+
+        return { success: true };
+    } catch (error) {
+        console.error('Distributorship purchase error:', error);
+        if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: 'An unknown error occurred during the purchase process.' };
     }
 }
