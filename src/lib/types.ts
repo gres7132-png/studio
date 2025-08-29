@@ -10,7 +10,6 @@ export interface User {
   createdAt: string;
   wallet: Wallet;
   investments: Investment[];
-  transactions: Transaction[];
   referralsMade: Referral[];
   id?: string; // Firestore document ID
   hasInvested?: boolean; // To track first investment for commission

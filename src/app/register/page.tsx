@@ -60,7 +60,6 @@ export default function RegisterPage({
                     totalWithdrawal: 0,
                 },
                 investments: [],
-                transactions: [],
                 referralsMade: [],
                 hasInvested: false,
             });

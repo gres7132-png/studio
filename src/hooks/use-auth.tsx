@@ -42,7 +42,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       const userDocRef = doc(db, "users", authUser.uid);
       const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
         if (doc.exists()) {
-          const userData = doc.data() as User;
+          const userData = { ...doc.data(), uid: doc.id } as User;
           setUser(userData);
           checkAndPayDividends(userData); // Check for dividends when user data is loaded/updated
         } else {

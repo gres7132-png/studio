@@ -8,9 +8,29 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet as WalletIcon } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
+import type { Transaction } from '@/lib/types';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function WalletPage() {
-  const { user } = useAuth();
+  const { user, authUser } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    if (authUser) {
+      const q = query(
+        collection(db, "transactions"), 
+        where("userId", "==", authUser.uid),
+        orderBy("createdAt", "desc")
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const userTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction));
+        setTransactions(userTransactions);
+      });
+      return () => unsubscribe();
+    }
+  }, [authUser]);
 
   if (!user) {
     return (
@@ -25,7 +45,7 @@ export default function WalletPage() {
     );
   }
 
-  const { wallet, transactions } = user;
+  const { wallet } = user;
 
   return (
     <div className="space-y-8">

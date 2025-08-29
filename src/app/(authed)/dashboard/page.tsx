@@ -10,14 +10,16 @@ import { useAuth } from '@/hooks/use-auth';
 import { getTodaysEarnings } from '@/lib/data'; 
 import { Skeleton } from '@/components/ui/skeleton';
 import { useEffect, useState } from 'react';
-import type { Package } from '@/lib/types';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import type { Package, Transaction } from '@/lib/types';
+import { collection, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
 
 export default function DashboardPage() {
   const { authUser, user } = useAuth();
   const [packages, setPackages] = useState<Package[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loadingPackages, setLoadingPackages] = useState(true);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
 
   useEffect(() => {
     const q = query(collection(db, "packages"), where("isActive", "==", true));
@@ -28,6 +30,24 @@ export default function DashboardPage() {
     });
     return () => unsubscribe();
   }, []);
+
+   useEffect(() => {
+    if (authUser) {
+      setLoadingTransactions(true);
+      const q = query(
+        collection(db, "transactions"), 
+        where("userId", "==", authUser.uid),
+        orderBy("createdAt", "desc"),
+        limit(5)
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const userTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction));
+        setTransactions(userTransactions);
+        setLoadingTransactions(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [authUser]);
   
   if (!user || !authUser || loadingPackages) {
     return (
@@ -100,7 +120,7 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="text-xl font-headline font-bold md:text-2xl">Recent Transactions</h2>
-        <RecentTransactions transactions={user.transactions.slice(0, 5)} />
+        <RecentTransactions transactions={transactions} />
       </div>
     </div>
   );

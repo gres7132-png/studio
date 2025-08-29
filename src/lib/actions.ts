@@ -1,7 +1,7 @@
 
 'use server';
 
-import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch, addDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User, Transaction, Investment, Package, Referral, DistributorLevel } from './types';
 import { addDays, formatISO } from 'date-fns';
@@ -25,45 +25,19 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
         return { success: false, error: 'Transaction amount must be positive.' };
     }
 
-    const userDocRef = doc(db, 'users', userId);
-
     try {
-        await runTransaction(db, async (transaction) => {
-            const userDoc = await transaction.get(userDocRef);
-            if (!userDoc.exists()) {
-                throw new Error('User not found.');
-            }
+        const newTransactionData: Omit<Transaction, 'id'> = {
+            userId,
+            type,
+            amount,
+            status: 'pending', // All transactions start as pending until admin approval
+            paymentMethod,
+            createdAt: new Date().toISOString(),
+        };
 
-            const user = userDoc.data() as User;
-            const newTransactionData: Omit<Transaction, 'id' | 'userId'> = {
-                type,
-                amount,
-                status: 'pending', // All transactions start as pending until admin approval
-                paymentMethod,
-                createdAt: new Date().toISOString(),
-            };
+        // All transactions are now stored in a single top-level 'transactions' collection
+        await addDoc(collection(db, 'transactions'), newTransactionData);
 
-            if (type === 'withdrawal') {
-                const fee = amount * 0.15;
-                const totalDeduction = amount; // Fee is just for information, admin should handle it.
-
-                if (user.wallet.balance < totalDeduction) {
-                    throw new Error('Insufficient balance to cover withdrawal.');
-                }
-                // For withdrawals, we just create the pending transaction.
-                // An admin would later approve it and deduct the balance.
-                transaction.update(userDocRef, {
-                    transactions: arrayUnion({ ...newTransactionData, userId }),
-                });
-
-            } else { // Deposit
-                // Similarly, deposits would need verification. For simulation, we'll mark as pending.
-                 transaction.update(userDocRef, {
-                    transactions: arrayUnion({ ...newTransactionData, userId }),
-                });
-            }
-        });
-        
         return { success: true };
 
     } catch (error) {
@@ -72,6 +46,64 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
             return { success: false, error: error.message };
         }
         return { success: false, error: 'An unknown error occurred.' };
+    }
+}
+
+interface HandleTransactionApprovalParams {
+    transactionId: string;
+    newStatus: 'success' | 'failed';
+}
+
+export async function handleTransactionApproval(params: HandleTransactionApprovalParams): Promise<{ success: boolean; error?: string }> {
+    const { transactionId, newStatus } = params;
+    const transactionDocRef = doc(db, 'transactions', transactionId);
+
+    try {
+        await runTransaction(db, async (transaction) => {
+            const transactionDoc = await transaction.get(transactionDocRef);
+            if (!transactionDoc.exists()) {
+                throw new Error("Transaction not found.");
+            }
+            const txData = transactionDoc.data() as Transaction;
+            if (txData.status !== 'pending') {
+                throw new Error("This transaction has already been processed.");
+            }
+
+            const userDocRef = doc(db, 'users', txData.userId);
+            const userDoc = await transaction.get(userDocRef);
+            if (!userDoc.exists()) {
+                throw new Error("User associated with this transaction not found.");
+            }
+            
+            // Update transaction status
+            transaction.update(transactionDocRef, { status: newStatus });
+
+            // If successful, update user's wallet
+            if (newStatus === 'success') {
+                if (txData.type === 'deposit') {
+                    transaction.update(userDocRef, {
+                        'wallet.balance': increment(txData.amount),
+                        'wallet.totalRecharge': increment(txData.amount),
+                    });
+                } else if (txData.type === 'withdrawal') {
+                     const user = userDoc.data() as User;
+                     if (user.wallet.balance < txData.amount) {
+                         throw new Error('User has insufficient balance for this withdrawal.');
+                     }
+                    transaction.update(userDocRef, {
+                        'wallet.balance': increment(-txData.amount),
+                        'wallet.totalWithdrawal': increment(txData.amount),
+                    });
+                }
+            }
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('Transaction approval error:', error);
+        if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: 'An unknown error occurred during approval.' };
     }
 }
 
@@ -125,7 +157,7 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
             createdAt: formatISO(now),
         };
 
-        const newTransaction: Omit<Transaction, 'id'> = {
+        const investmentTransactionData: Omit<Transaction, 'id'> = {
             userId: user.uid,
             type: 'investment',
             amount: pkg.price,
@@ -134,10 +166,12 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
             createdAt: formatISO(now),
         };
 
+        const newTransactionRef = doc(collection(db, 'transactions'));
+        batch.set(newTransactionRef, investmentTransactionData);
+
         batch.update(userDocRef, {
             'wallet.balance': increment(-pkg.price),
             investments: arrayUnion(newInvestment),
-            transactions: arrayUnion(newTransaction),
             hasInvested: true
         });
 
@@ -148,7 +182,7 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
 
             if (referrerDoc.exists()) {
                 const commissionAmount = pkg.price * 0.05;
-                const commissionTransaction: Omit<Transaction, 'id'> = {
+                const commissionTransactionData: Omit<Transaction, 'id'> = {
                     userId: user.referredBy,
                     type: 'commission',
                     amount: commissionAmount,
@@ -156,6 +190,9 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
                     paymentMethod: `Referral: ${user.name}`,
                     createdAt: formatISO(now),
                 };
+                
+                const newCommissionRef = doc(collection(db, 'transactions'));
+                batch.set(newCommissionRef, commissionTransactionData);
                 
                 const newReferral: Referral = {
                     id: user.uid,
@@ -168,7 +205,6 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
 
                 batch.update(referrerDocRef, {
                     'wallet.balance': increment(commissionAmount),
-                    transactions: arrayUnion(commissionTransaction),
                     referralsMade: arrayUnion(newReferral)
                 });
             }
@@ -226,7 +262,7 @@ export async function handleDistributorshipPurchase(params: HandleDistributorshi
             
             const now = new Date();
             const nowISO = formatISO(now);
-            const newTransaction: Omit<Transaction, 'id'> = {
+            const newTransactionData: Omit<Transaction, 'id'> = {
                 userId: user.uid,
                 type: 'distributorship',
                 amount: levelData.purchasePrice,
@@ -235,9 +271,11 @@ export async function handleDistributorshipPurchase(params: HandleDistributorshi
                 createdAt: nowISO,
             };
 
+            const newTransactionRef = doc(collection(db, 'transactions'));
+            transaction.set(newTransactionRef, newTransactionData);
+
             transaction.update(userDocRef, {
                 'wallet.balance': increment(-levelData.purchasePrice),
-                transactions: arrayUnion(newTransaction),
                 purchasedDividendLevel: levelData.level,
                 distributorshipPurchaseDate: nowISO,
                 lastDividendPayoutDate: nowISO, // Set initial payout date
@@ -279,7 +317,7 @@ export async function handleDividendPayout(userId: string): Promise<{ success: b
             const nowISO = formatISO(now);
             const dividendAmount = levelData.monthlyDividend;
 
-            const newTransaction: Omit<Transaction, 'id'> = {
+            const newTransactionData: Omit<Transaction, 'id'> = {
                 userId: user.uid,
                 type: 'dividend',
                 amount: dividendAmount,
@@ -288,9 +326,12 @@ export async function handleDividendPayout(userId: string): Promise<{ success: b
                 createdAt: nowISO,
             };
 
+            const newTransactionRef = doc(collection(db, 'transactions'));
+            firestoreTransaction.set(newTransactionRef, newTransactionData);
+
+
             firestoreTransaction.update(userDocRef, {
                 'wallet.balance': increment(dividendAmount),
-                transactions: arrayUnion(newTransaction),
                 lastDividendPayoutDate: nowISO,
             });
         });

@@ -21,6 +21,7 @@ import {
   UserCog,
   Settings,
   Landmark,
+  Receipt,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '../ui/skeleton';
@@ -41,8 +42,9 @@ const mockAdminEmails = ['admin@example.com', 'balenciaga-admin@example.com'];
 
 const adminNavItems = [
   { href: '/admin/dashboard', label: 'Admin Dashboard', icon: Shield },
-  { href: '/admin/packages', label: 'Manage Packages', icon: Package },
   { href: '/admin/users', label: 'Manage Users', icon: UserCog },
+  { href: '/admin/packages', label: 'Manage Packages', icon: Package },
+  { href: '/admin/transactions', label: 'Transactions', icon: Receipt },
 ];
 
 export function SidebarNav({}: SidebarNavProps) {
