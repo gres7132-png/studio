@@ -25,15 +25,14 @@ import { Textarea } from "../ui/textarea";
 interface EditPackageSheetProps {
   pkg?: Package;
   onSave: (pkg: Package) => void;
-  onDelete?: (id: number) => void;
-  onToggleStatus?: (id: number) => void;
+  onDelete?: (id: string) => void;
+  onToggleStatus?: () => void;
   children?: React.ReactNode;
 }
 
 export function EditPackageSheet({ pkg, onSave, onDelete, onToggleStatus, children }: EditPackageSheetProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { toast } = useToast();
-  const [editedPackage, setEditedPackage] = useState<Partial<Package>>(pkg || { isActive: true });
+  const [editedPackage, setEditedPackage] = useState<Partial<Package>>(pkg || { isActive: true, image: '' });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { id, value, type } = e.target;
@@ -50,40 +49,27 @@ export function EditPackageSheet({ pkg, onSave, onDelete, onToggleStatus, childr
     const totalReturn = (editedPackage.dailyReturn || 0) * (editedPackage.durationDays || 0);
     
     onSave({ ...editedPackage, totalReturn } as Package);
-    toast({
-        title: pkg ? "Package Updated" : "Package Created",
-        description: `Package "${editedPackage.name}" has been saved.`,
-    })
     setIsOpen(false);
     if (!pkg) {
-        setEditedPackage({ isActive: true });
+        setEditedPackage({ isActive: true, image: '' });
     }
   };
 
   const handleDelete = () => {
     if(pkg && onDelete) {
         onDelete(pkg.id);
-         toast({
-            title: "Package Deleted",
-            description: `Package "${pkg.name}" has been deleted.`,
-            variant: "destructive"
-        })
         setIsOpen(false);
     }
   }
 
   const handleToggle = () => {
       if(pkg && onToggleStatus) {
-          onToggleStatus(pkg.id);
-          toast({
-            title: "Status Toggled",
-            description: `Status for "${pkg.name}" has been changed.`,
-        })
+          onToggleStatus();
       }
   }
 
   const trigger = children ? (
-    <SheetTrigger asChild>{children}</SheetTrigger>
+    <SheetTrigger asChild onClick={() => setIsOpen(true)}>{children}</SheetTrigger>
   ) : (
     <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -152,4 +138,3 @@ export function EditPackageSheet({ pkg, onSave, onDelete, onToggleStatus, childr
     </Sheet>
   );
 }
-

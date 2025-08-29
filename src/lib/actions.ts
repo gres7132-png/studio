@@ -1,10 +1,9 @@
 
 'use server';
 
-import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from './firebase';
-import type { User, Transaction, Investment } from './types';
-import { packages } from './data';
+import type { User, Transaction, Investment, Package } from './types';
 import { addDays, formatISO } from 'date-fns';
 
 
@@ -35,7 +34,7 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
             }
 
             const user = userDoc.data() as User;
-            const newTransactionData = {
+            const newTransactionData: Omit<Transaction, 'id' | 'userId'> = {
                 type,
                 amount,
                 status: 'pending', // All transactions start as pending until admin approval
@@ -52,19 +51,15 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
                 }
                 // For withdrawals, we just create the pending transaction.
                 // An admin would later approve it and deduct the balance.
-                // For this simulation, we'll deduct it immediately for the user to see the change.
+                // For this simulation, we'll mark as pending and let admin handle it.
                 transaction.update(userDocRef, {
-                    'wallet.balance': increment(-totalDeduction),
-                    'wallet.totalWithdrawal': increment(amount),
-                    transactions: arrayUnion(newTransactionData),
+                    transactions: arrayUnion({ ...newTransactionData, userId }),
                 });
 
             } else { // Deposit
-                // Similarly, deposits would need verification. For simulation, we add it directly.
+                // Similarly, deposits would need verification. For simulation, we'll mark as pending.
                  transaction.update(userDocRef, {
-                    'wallet.balance': increment(amount),
-                    'wallet.totalRecharge': increment(amount),
-                    transactions: arrayUnion(newTransactionData),
+                    transactions: arrayUnion({ ...newTransactionData, userId }),
                 });
             }
         });
@@ -83,7 +78,7 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
 
 interface HandleInvestmentParams {
     userId: string;
-    packageId: number;
+    packageId: string;
 }
 
 export async function handleInvestment(params: HandleInvestmentParams): Promise<{ success: boolean; error?: string }> {
@@ -92,21 +87,23 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
     if (!userId) {
         return { success: false, error: 'User is not authenticated.' };
     }
-
-    const pkg = packages.find(p => p.id === packageId);
-    if (!pkg) {
-        return { success: false, error: 'Invalid package selected.' };
-    }
-
+    
+    const packageDocRef = doc(db, "packages", packageId);
     const userDocRef = doc(db, 'users', userId);
 
     try {
         await runTransaction(db, async (transaction) => {
+            const packageDoc = await transaction.get(packageDocRef);
             const userDoc = await transaction.get(userDocRef);
+
+            if (!packageDoc.exists()) {
+                throw new Error("Invalid package selected.");
+            }
             if (!userDoc.exists()) {
                 throw new Error("User not found.");
             }
-
+            
+            const pkg = { ...packageDoc.data(), id: packageDoc.id } as Package;
             const user = userDoc.data() as User;
 
             if (user.wallet.balance < pkg.price) {

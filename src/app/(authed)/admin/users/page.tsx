@@ -17,7 +17,7 @@ import { EditUserSheet } from "@/components/admin/edit-user-sheet";
 import { useState, useEffect } from "react";
 import type { User } from "@/lib/types";
 import { db } from "@/lib/firebase";
-import { collection, onSnapshot, doc, updateDoc, addDoc } from "firebase/firestore";
+import { collection, onSnapshot, doc, updateDoc, addDoc, setDoc } from "firebase/firestore";
 import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsersPage() {
@@ -26,7 +26,7 @@ export default function AdminUsersPage() {
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as unknown as User));
+            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as User));
             setUsers(usersData);
         });
         return () => unsubscribe();
@@ -34,12 +34,14 @@ export default function AdminUsersPage() {
 
     const handleSave = async (updatedUser: User) => {
         try {
-            if (users.find(u => u.id === updatedUser.id)) {
+            if (updatedUser.id) {
                  const userDocRef = doc(db, "users", updatedUser.id as string);
-                 await updateDoc(userDocRef, updatedUser as any);
+                 // We remove the id from the object before saving to firestore
+                 const { id, ...userData } = updatedUser;
+                 await setDoc(userDocRef, userData, { merge: true });
             } else {
                 // In a real app, adding users would be more complex (e.g. need auth credentials)
-                // This is a simplified version.
+                // This is a simplified version for adding users manually.
                 await addDoc(collection(db, "users"), updatedUser);
             }
              toast({

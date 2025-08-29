@@ -1,6 +1,6 @@
 
 'use client';
-import { packages, testimonials } from '@/lib/data';
+import { testimonials } from '@/lib/data';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { PackagesList } from '@/components/dashboard/packages-list';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
@@ -9,11 +9,27 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/hooks/use-auth';
 import { getTodaysEarnings } from '@/lib/data'; 
 import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
+import type { Package } from '@/lib/types';
+import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function DashboardPage() {
   const { authUser, user } = useAuth();
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [loadingPackages, setLoadingPackages] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "packages"), where("isActive", "==", true));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const packagesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Package));
+        setPackages(packagesData);
+        setLoadingPackages(false);
+    });
+    return () => unsubscribe();
+  }, []);
   
-  if (!user || !authUser) {
+  if (!user || !authUser || loadingPackages) {
     return (
       <div className="space-y-8">
           <div>

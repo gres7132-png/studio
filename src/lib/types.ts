@@ -16,7 +16,7 @@ export interface User {
 }
 
 export interface Package {
-  id: number;
+  id: string; // Firestore document ID
   name: string;
   description: string;
   price: number;
@@ -30,7 +30,7 @@ export interface Package {
 export interface Investment {
   id: number;
   userId: string;
-  packageId: number;
+  packageId: string; // Changed to string to match Firestore ID
   package: Package;
   amount: number;
   startDate: string;
@@ -41,7 +41,7 @@ export interface Investment {
 }
 
 export interface Transaction {
-  id?: number;
+  id?: string; // Firestore document ID or a generated string
   userId: string;
   type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout';
   amount: number;

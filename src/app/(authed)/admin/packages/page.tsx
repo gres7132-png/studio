@@ -1,6 +1,5 @@
 
 'use client';
-import { packages as initialPackages } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -14,28 +13,63 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { EditPackageSheet } from "@/components/admin/edit-package-sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { Package } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot, doc, setDoc, addDoc, deleteDoc, updateDoc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminPackagesPage() {
-  const [packages, setPackages] = useState<Package[]>(initialPackages);
+  const [packages, setPackages] = useState<Package[]>([]);
+  const { toast } = useToast();
 
-  const handleSave = (newPackage: Package) => {
-    if(newPackage.id) {
-        setPackages(packages.map(p => p.id === newPackage.id ? newPackage : p))
-    } else {
-        // A real implementation would get a new ID from a database
-        const newId = Math.max(...packages.map(p => p.id)) + 1;
-        setPackages([...packages, {...newPackage, id: newId}]);
+  useEffect(() => {
+    const unsubscribe = onSnapshot(collection(db, "packages"), (snapshot) => {
+        const packagesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Package));
+        setPackages(packagesData);
+    });
+    return () => unsubscribe();
+  }, []);
+
+
+  const handleSave = async (newPackage: Package) => {
+    try {
+        if(newPackage.id) {
+            const packageDocRef = doc(db, "packages", newPackage.id);
+            const { id, ...packageData } = newPackage;
+            await setDoc(packageDocRef, packageData);
+        } else {
+            await addDoc(collection(db, "packages"), newPackage);
+        }
+        toast({
+            title: newPackage.id ? "Package Updated" : "Package Created",
+            description: `Package "${newPackage.name}" has been saved.`,
+        });
+    } catch(e) {
+        console.error("Error saving package: ", e);
+        toast({ title: "Save Failed", variant: "destructive" });
     }
   }
 
-  const handleDelete = (packageId: number) => {
-    setPackages(packages.filter(p => p.id !== packageId));
+  const handleDelete = async (packageId: string) => {
+     try {
+        await deleteDoc(doc(db, "packages", packageId));
+        toast({ title: "Package Deleted", variant: "destructive" });
+    } catch (e) {
+        console.error("Error deleting package: ", e);
+        toast({ title: "Delete Failed", variant: "destructive" });
+    }
   }
 
-  const handleToggleStatus = (packageId: number) => {
-      setPackages(packages.map(p => p.id === packageId ? {...p, isActive: !p.isActive} : p));
+  const handleToggleStatus = async (pkg: Package) => {
+      try {
+        const packageDocRef = doc(db, "packages", pkg.id);
+        await updateDoc(packageDocRef, { isActive: !pkg.isActive });
+        toast({ title: "Status Toggled"});
+      } catch (e) {
+        console.error("Error toggling status: ", e);
+        toast({ title: "Toggle Failed", variant: "destructive" });
+      }
   }
 
 
@@ -79,7 +113,7 @@ export default function AdminPackagesPage() {
                         pkg={pkg} 
                         onSave={handleSave} 
                         onDelete={handleDelete}
-                        onToggleStatus={handleToggleStatus}
+                        onToggleStatus={() => handleToggleStatus(pkg)}
                     />
                 </TableCell>
               </TableRow>
