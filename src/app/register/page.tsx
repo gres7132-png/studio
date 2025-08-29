@@ -39,8 +39,19 @@ export default function RegisterPage({
             await updateProfile(userCredential.user, {
                 displayName: name,
             });
-            // Here you would typically also save the user to your database
-            // along with mobile number and referrer code.
+            // **DATABASE LOGIC NEEDED HERE**
+            // In a real application, you would make an API call to a server function here.
+            // This function would:
+            // 1. Create a 'users' document in your database (e.g., Firestore).
+            // 2. Save the user's name, email, mobile, and their new UID from `userCredential.user.uid`.
+            // 3. Check for a referrer ID in `searchParams.ref` and save it to the new user's document.
+            // 4. The user's own UID becomes their referral code for others to use.
+            
+            toast({
+                title: "Account Created",
+                description: "Welcome! We're redirecting you to your dashboard.",
+            });
+
             router.push('/dashboard');
         } catch (error: any) {
              toast({

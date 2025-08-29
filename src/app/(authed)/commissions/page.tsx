@@ -1,6 +1,6 @@
 
 'use client';
-import { mockUser } from '@/lib/data'; // Still using some mock data
+import { mockUser } from '@/lib/data'; // Still using some mock data for display
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -20,20 +20,26 @@ import { useAuth } from '@/hooks/use-auth';
 
 export default function CommissionsPage() {
   const { user } = useAuth();
-  const { referralsMade } = mockUser; // Still using some mock data
+  // Display data is still mocked until database is connected.
+  const { referralsMade } = mockUser; 
+  const { toast } = useToast();
+  
+  // The referral link is now dynamically generated based on the logged-in user's UID.
   const referralLink = user ? `https://app.balenciaga-rights.com/register?ref=${user.uid}` : '';
+  
   const totalCommissions = referralsMade.reduce(
     (sum, ref) => sum + ref.commissionAmount,
     0
   );
-  const { toast } = useToast();
 
   const handleCopy = () => {
-    navigator.clipboard.writeText(referralLink);
-    toast({
-      title: "Copied to clipboard!",
-      description: "Your referral link has been copied.",
-    });
+    if (referralLink) {
+      navigator.clipboard.writeText(referralLink);
+      toast({
+        title: "Copied to clipboard!",
+        description: "Your referral link has been copied.",
+      });
+    }
   }
   
   if (!user) return null;
@@ -93,29 +99,29 @@ export default function CommissionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {referralsMade.map((ref) => (
-                <TableRow key={ref.id}>
-                  <TableCell>
-                    <div className="flex items-center gap-3">
-                       <Avatar className="h-9 w-9">
-                         
-                         <AvatarFallback>{ref.referred.name.charAt(0)}</AvatarFallback>
-                       </Avatar>
-                       <div>
-                         <div className="font-medium">{ref.referred.name}</div>
-                         <div className="text-sm text-muted-foreground">{ref.referred.email}</div>
-                       </div>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {format(parseISO(ref.createdAt), 'PPP')}
-                  </TableCell>
-                  <TableCell className="text-right font-medium text-green-600">
-                    +Ksh {ref.commissionAmount.toLocaleString()}
-                  </TableCell>
-                </TableRow>
-              ))}
-              {referralsMade.length === 0 && (
+              {referralsMade.length > 0 ? (
+                referralsMade.map((ref) => (
+                  <TableRow key={ref.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                         <Avatar className="h-9 w-9">
+                           <AvatarFallback>{ref.referred.name.charAt(0)}</AvatarFallback>
+                         </Avatar>
+                         <div>
+                           <div className="font-medium">{ref.referred.name}</div>
+                           <div className="text-sm text-muted-foreground">{ref.referred.email}</div>
+                         </div>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      {format(parseISO(ref.createdAt), 'PPP')}
+                    </TableCell>
+                    <TableCell className="text-right font-medium text-green-600">
+                      +Ksh {ref.commissionAmount.toLocaleString()}
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
                 <TableRow>
                     <TableCell colSpan={3} className="text-center text-muted-foreground h-24">
                         You haven&apos;t referred any users yet.
