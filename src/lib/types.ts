@@ -13,6 +13,7 @@ export interface User {
   transactions: Transaction[];
   referralsMade: Referral[];
   id?: string; // Firestore document ID
+  hasInvested?: boolean; // To track first investment for commission
 }
 
 export interface Package {
@@ -51,7 +52,7 @@ export interface Transaction {
 }
 
 export interface Referral {
-  id: number;
+  id: string; // Using referred user's ID for uniqueness
   referrerId: string;
   referredId: string;
   referred: {

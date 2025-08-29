@@ -31,6 +31,7 @@ export default function RegisterPage({
     const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [referrerCode, setReferrerCode] = useState(searchParams.ref || '');
 
     async function register(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -51,13 +52,17 @@ export default function RegisterPage({
                 email: email,
                 mobile: mobile,
                 isAdmin: false,
-                referredBy: searchParams.ref || null,
+                referredBy: referrerCode || null,
                 createdAt: new Date().toISOString(),
                 wallet: {
                     balance: 0,
                     totalRecharge: 0,
                     totalWithdrawal: 0,
                 },
+                investments: [],
+                transactions: [],
+                referralsMade: [],
+                hasInvested: false,
             });
             
             toast({
@@ -106,7 +111,7 @@ export default function RegisterPage({
             </div>
              <div className="space-y-2">
               <Label htmlFor="referrer">Referrer Code (Optional)</Label>
-              <Input id="referrer" placeholder="Enter referrer ID" defaultValue={searchParams.ref} />
+              <Input id="referrer" placeholder="Enter referrer ID" value={referrerCode} onChange={(e) => setReferrerCode(e.target.value)} />
             </div>
           </CardContent>
           <CardFooter className="flex flex-col gap-4">

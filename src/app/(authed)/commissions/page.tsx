@@ -24,7 +24,7 @@ export default function CommissionsPage() {
   const { toast } = useToast();
   
   const referralsMade: Referral[] = user?.referralsMade || [];
-  const referralLink = authUser ? `https://app.balenciaga-rights.com/register?ref=${authUser.uid}` : '';
+  const referralLink = authUser ? `${window.location.origin}/register?ref=${authUser.uid}` : '';
   
   const totalCommissions = referralsMade.reduce(
     (sum, ref) => sum + ref.commissionAmount,

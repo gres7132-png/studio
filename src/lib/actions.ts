@@ -1,9 +1,9 @@
 
 'use server';
 
-import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch } from 'firebase/firestore';
 import { db } from './firebase';
-import type { User, Transaction, Investment, Package } from './types';
+import type { User, Transaction, Investment, Package, Referral } from './types';
 import { addDays, formatISO } from 'date-fns';
 
 
@@ -44,14 +44,13 @@ export async function handleTransaction(params: HandleTransactionParams): Promis
 
             if (type === 'withdrawal') {
                 const fee = amount * 0.15;
-                const totalDeduction = amount + fee;
+                const totalDeduction = amount; // Fee is just for information, admin should handle it.
 
                 if (user.wallet.balance < totalDeduction) {
-                    throw new Error('Insufficient balance to cover withdrawal and fee.');
+                    throw new Error('Insufficient balance to cover withdrawal.');
                 }
                 // For withdrawals, we just create the pending transaction.
                 // An admin would later approve it and deduct the balance.
-                // For this simulation, we'll mark as pending and let admin handle it.
                 transaction.update(userDocRef, {
                     transactions: arrayUnion({ ...newTransactionData, userId }),
                 });
@@ -92,53 +91,89 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
     const userDocRef = doc(db, 'users', userId);
 
     try {
-        await runTransaction(db, async (transaction) => {
-            const packageDoc = await transaction.get(packageDocRef);
-            const userDoc = await transaction.get(userDocRef);
+        const batch = writeBatch(db);
 
-            if (!packageDoc.exists()) {
-                throw new Error("Invalid package selected.");
-            }
-            if (!userDoc.exists()) {
-                throw new Error("User not found.");
-            }
-            
-            const pkg = { ...packageDoc.data(), id: packageDoc.id } as Package;
-            const user = userDoc.data() as User;
+        const packageDoc = await getDoc(packageDocRef);
+        const userDoc = await getDoc(userDocRef);
 
-            if (user.wallet.balance < pkg.price) {
-                throw new Error("Insufficient wallet balance for this purchase.");
-            }
+        if (!packageDoc.exists()) {
+            throw new Error("Invalid package selected.");
+        }
+        if (!userDoc.exists()) {
+            throw new Error("User not found.");
+        }
+        
+        const pkg = { ...packageDoc.data(), id: packageDoc.id } as Package;
+        const user = userDoc.data() as User;
 
-            const now = new Date();
-            const newInvestment: Investment = {
-                id: Date.now(), // Using timestamp for a unique ID in this simulation
-                userId: user.uid,
-                packageId: pkg.id,
-                package: pkg,
-                amount: pkg.price,
-                startDate: formatISO(now),
-                endDate: formatISO(addDays(now, pkg.durationDays)),
-                status: 'active',
-                earnings: 0,
-                createdAt: formatISO(now),
-            };
+        if (user.wallet.balance < pkg.price) {
+            throw new Error("Insufficient wallet balance for this purchase.");
+        }
 
-            const newTransaction: Omit<Transaction, 'id'> = {
-                userId: user.uid,
-                type: 'investment',
-                amount: pkg.price,
-                status: 'success',
-                paymentMethod: 'wallet',
-                createdAt: formatISO(now),
-            };
+        const now = new Date();
+        const newInvestment: Investment = {
+            id: Date.now(),
+            userId: user.uid,
+            packageId: pkg.id,
+            package: pkg,
+            amount: pkg.price,
+            startDate: formatISO(now),
+            endDate: formatISO(addDays(now, pkg.durationDays)),
+            status: 'active',
+            earnings: 0,
+            createdAt: formatISO(now),
+        };
 
-            transaction.update(userDocRef, {
-                'wallet.balance': increment(-pkg.price),
-                investments: arrayUnion(newInvestment),
-                transactions: arrayUnion(newTransaction),
-            });
+        const newTransaction: Omit<Transaction, 'id'> = {
+            userId: user.uid,
+            type: 'investment',
+            amount: pkg.price,
+            status: 'success',
+            paymentMethod: 'wallet',
+            createdAt: formatISO(now),
+        };
+
+        batch.update(userDocRef, {
+            'wallet.balance': increment(-pkg.price),
+            investments: arrayUnion(newInvestment),
+            transactions: arrayUnion(newTransaction),
+            hasInvested: true
         });
+
+        // Handle referral commission if it's the user's first investment
+        if (!user.hasInvested && user.referredBy) {
+            const referrerDocRef = doc(db, 'users', user.referredBy);
+            const referrerDoc = await getDoc(referrerDocRef);
+
+            if (referrerDoc.exists()) {
+                const commissionAmount = pkg.price * 0.05;
+                const commissionTransaction: Omit<Transaction, 'id'> = {
+                    userId: user.referredBy,
+                    type: 'commission',
+                    amount: commissionAmount,
+                    status: 'success',
+                    paymentMethod: `Referral: ${user.name}`,
+                    createdAt: formatISO(now),
+                };
+                
+                const newReferral: Referral = {
+                    id: user.uid,
+                    referrerId: user.referredBy,
+                    referredId: user.uid,
+                    referred: { name: user.name, email: user.email },
+                    commissionAmount,
+                    createdAt: formatISO(now),
+                };
+
+                batch.update(referrerDocRef, {
+                    'wallet.balance': increment(commissionAmount),
+                    transactions: arrayUnion(commissionTransaction),
+                    referralsMade: arrayUnion(newReferral)
+                });
+            }
+        }
+        
+        await batch.commit();
 
         return { success: true };
     } catch (error) {
