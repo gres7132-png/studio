@@ -1,6 +1,5 @@
 
 'use client';
-import { allUsers as initialUsersData } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -18,31 +17,42 @@ import { EditUserSheet } from "@/components/admin/edit-user-sheet";
 import { useState, useEffect } from "react";
 import type { User } from "@/lib/types";
 import { db } from "@/lib/firebase";
-import { collection, onSnapshot } from "firebase/firestore";
+import { collection, onSnapshot, doc, updateDoc, addDoc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsersPage() {
     const [users, setUsers] = useState<User[]>([]);
+    const { toast } = useToast();
 
     useEffect(() => {
         const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
-            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as User));
+            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as unknown as User));
             setUsers(usersData);
         });
         return () => unsubscribe();
     }, []);
 
-    const handleSave = (newUser: User) => {
-        // This would be handled by a server action or API route in a real app
-        // For now, we update the local state to see the change immediately
-        if(users.find(u => u.id === newUser.id)) {
-            setUsers(users.map(u => u.id === newUser.id ? newUser : u));
-        } else {
-            // A real implementation would get a new ID from a database
-            const userWithId = {
-                ...newUser,
-                id: Math.random(), // temporary ID
-            };
-            setUsers([...users, userWithId]);
+    const handleSave = async (updatedUser: User) => {
+        try {
+            if (users.find(u => u.id === updatedUser.id)) {
+                 const userDocRef = doc(db, "users", updatedUser.id as string);
+                 await updateDoc(userDocRef, updatedUser as any);
+            } else {
+                // In a real app, adding users would be more complex (e.g. need auth credentials)
+                // This is a simplified version.
+                await addDoc(collection(db, "users"), updatedUser);
+            }
+             toast({
+                title: "User Saved",
+                description: `Details for ${updatedUser.name} have been successfully saved.`,
+            });
+        } catch (error) {
+            console.error("Error saving user: ", error);
+             toast({
+                title: "Save Failed",
+                description: "There was an error saving the user details.",
+                variant: "destructive",
+            });
         }
     }
 
