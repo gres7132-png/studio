@@ -46,7 +46,7 @@ export interface Investment {
 export interface Transaction {
   id?: string; // Firestore document ID or a generated string
   userId: string;
-  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout' | 'distributorship' | 'dividend';
+  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'distributorship' | 'dividend';
   amount: number;
   status: 'success' | 'pending' | 'failed';
   paymentMethod: string;

@@ -33,7 +33,7 @@ type TransactionWithUser = Transaction & { userName: string; userEmail: string }
 export default function AdminTransactionsPage() {
   const [transactions, setTransactions] = useState<TransactionWithUser[]>([]);
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const q = query(collection(db, "transactions"), orderBy("createdAt", "desc"));
