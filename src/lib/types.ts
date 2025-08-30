@@ -1,19 +1,26 @@
 
+
 export interface User {
-  id: number;
+  uid: string; // Firebase Auth UID
   name: string;
   email: string;
   mobile?: string;
   isAdmin: boolean;
+  referredBy?: string | null;
+  createdAt: string;
   wallet: Wallet;
   investments: Investment[];
-  transactions: Transaction[];
   referralsMade: Referral[];
+  id?: string; // Firestore document ID
+  hasInvested?: boolean; // To track first investment for commission
+  purchasedDividendLevel?: string;
+  distributorshipPurchaseDate?: string;
+  lastDividendPayoutDate?: string;
 }
 
 export interface Package {
-  id: number;
-  name: string;
+  id: string; // Firestore document ID
+  name:string;
   description: string;
   price: number;
   dailyReturn: number;
@@ -25,8 +32,8 @@ export interface Package {
 
 export interface Investment {
   id: number;
-  userId: number;
-  packageId: number;
+  userId: string;
+  packageId: string; // Changed to string to match Firestore ID
   package: Package;
   amount: number;
   startDate: string;
@@ -37,9 +44,9 @@ export interface Investment {
 }
 
 export interface Transaction {
-  id: number;
-  userId: number;
-  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'payout';
+  id?: string; // Firestore document ID or a generated string
+  userId: string;
+  type: 'deposit' | 'withdrawal' | 'investment' | 'commission' | 'distributorship' | 'dividend';
   amount: number;
   status: 'success' | 'pending' | 'failed';
   paymentMethod: string;
@@ -47,9 +54,9 @@ export interface Transaction {
 }
 
 export interface Referral {
-  id: number;
-  referrerId: number;
-  referredId: number;
+  id: string; // Using referred user's ID for uniqueness
+  referrerId: string;
+  referredId: string;
   referred: {
     name: string;
     email: string;
@@ -59,18 +66,9 @@ export interface Referral {
 }
 
 export interface Wallet {
-  id: number;
-  userId: number;
   balance: number;
   totalRecharge: number;
   totalWithdrawal: number;
-}
-
-export interface DistributorLevel {
-  level: string;
-  monthlyDividend: number;
-  purchasedProducts: number;
-  deposit: number;
 }
 
 export interface Testimonial {
@@ -79,4 +77,12 @@ export interface Testimonial {
   location: string;
   message: string;
   avatar: string;
+}
+
+export interface DistributorLevel {
+  level: string;
+  referralsNeeded: number;
+  monthlyDividend: number;
+  requiredTeamSize: number;
+  purchasePrice: number;
 }

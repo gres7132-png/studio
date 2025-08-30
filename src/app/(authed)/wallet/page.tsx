@@ -1,13 +1,51 @@
+
+'use client';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { mockUser } from '@/lib/data';
 import { DepositForm } from '@/components/wallet/deposit-form';
 import { WithdrawForm } from '@/components/wallet/withdraw-form';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Wallet as WalletIcon } from 'lucide-react';
+import { useAuth } from '@/hooks/use-auth';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
+import type { Transaction } from '@/lib/types';
+import { collection, onSnapshot, query, where, orderBy } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function WalletPage() {
-  const { wallet, transactions } = mockUser;
+  const { user, authUser } = useAuth();
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+
+  useEffect(() => {
+    if (authUser) {
+      const q = query(
+        collection(db, "transactions"), 
+        where("userId", "==", authUser.uid),
+        orderBy("createdAt", "desc")
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const userTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction));
+        setTransactions(userTransactions);
+      });
+      return () => unsubscribe();
+    }
+  }, [authUser]);
+
+  if (!user) {
+    return (
+       <div className="space-y-8">
+        <div>
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-64 mt-2" />
+        </div>
+        <Skeleton className="h-32 w-full" />
+        <Skeleton className="h-96 w-full" />
+      </div>
+    );
+  }
+
+  const { wallet } = user;
 
   return (
     <div className="space-y-8">

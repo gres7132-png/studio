@@ -1,3 +1,4 @@
+
 import type { User } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { DollarSign, TrendingUp, PiggyBank, CircleArrowOutUpRight, Download, Upload } from 'lucide-react';

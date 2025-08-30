@@ -1,20 +1,91 @@
 
-import { getTodaysEarnings, mockUser, packages, testimonials } from '@/lib/data';
+'use client';
+import { testimonials } from '@/lib/data';
 import { StatsCards } from '@/components/dashboard/stats-cards';
 import { PackagesList } from '@/components/dashboard/packages-list';
 import { RecentTransactions } from '@/components/dashboard/recent-transactions';
 import { TestimonialsCarousel } from '@/components/dashboard/testimonials-carousel';
 import { Separator } from '@/components/ui/separator';
+import { useAuth } from '@/hooks/use-auth';
+import { getTodaysEarnings } from '@/lib/data'; 
+import { Skeleton } from '@/components/ui/skeleton';
+import { useEffect, useState } from 'react';
+import type { Package, Transaction } from '@/lib/types';
+import { collection, onSnapshot, query, where, orderBy, limit } from 'firebase/firestore';
+import { db } from '@/lib/firebase';
 
 export default function DashboardPage() {
-  const user = mockUser;
+  const { authUser, user } = useAuth();
+  const [packages, setPackages] = useState<Package[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
+  const [loadingPackages, setLoadingPackages] = useState(true);
+  const [loadingTransactions, setLoadingTransactions] = useState(true);
+
+  useEffect(() => {
+    const q = query(collection(db, "packages"), where("isActive", "==", true));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const packagesData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Package));
+        setPackages(packagesData);
+        setLoadingPackages(false);
+    });
+    return () => unsubscribe();
+  }, []);
+
+   useEffect(() => {
+    if (authUser) {
+      setLoadingTransactions(true);
+      const q = query(
+        collection(db, "transactions"), 
+        where("userId", "==", authUser.uid),
+        orderBy("createdAt", "desc"),
+        limit(5)
+      );
+      const unsubscribe = onSnapshot(q, (snapshot) => {
+        const userTransactions = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as Transaction));
+        setTransactions(userTransactions);
+        setLoadingTransactions(false);
+      });
+      return () => unsubscribe();
+    }
+  }, [authUser]);
+  
+  if (!user || !authUser || loadingPackages) {
+    return (
+      <div className="space-y-8">
+          <div>
+            <Skeleton className="h-8 w-1/2" />
+            <Skeleton className="h-4 w-3/4 mt-2" />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+              <Skeleton className="h-28" />
+          </div>
+          <div>
+            <Skeleton className="h-8 w-1/3 mb-4" />
+            <Skeleton className="h-24 w-full" />
+          </div>
+          <Separator />
+           <div>
+            <Skeleton className="h-8 w-1/3 mb-4" />
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              <Skeleton className="h-64" />
+              <Skeleton className="h-64" />
+              <Skeleton className="h-64" />
+            </div>
+          </div>
+      </div>
+    );
+  }
+
   const todaysEarnings = getTodaysEarnings(user);
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-2xl font-headline font-bold md:text-3xl">
-          Welcome back, {user.name}!
+          Welcome back, {user?.name || 'User'}!
         </h1>
         <p className="text-muted-foreground">
           Here&apos;s a summary of your account activity.
@@ -49,7 +120,7 @@ export default function DashboardPage() {
 
       <div>
         <h2 className="text-xl font-headline font-bold md:text-2xl">Recent Transactions</h2>
-        <RecentTransactions transactions={user.transactions.slice(0, 5)} />
+        <RecentTransactions transactions={transactions} />
       </div>
     </div>
   );

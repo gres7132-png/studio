@@ -1,6 +1,5 @@
 
 'use client';
-import { allUsers as initialUsers } from "@/lib/data";
 import {
   Table,
   TableBody,
@@ -15,27 +14,47 @@ import { Badge } from "@/components/ui/badge";
 import { PlusCircle } from "lucide-react";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { EditUserSheet } from "@/components/admin/edit-user-sheet";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { User } from "@/lib/types";
+import { db } from "@/lib/firebase";
+import { collection, onSnapshot, doc, updateDoc, addDoc, setDoc } from "firebase/firestore";
+import { useToast } from "@/hooks/use-toast";
 
 export default function AdminUsersPage() {
-    const [users, setUsers] = useState<User[]>(initialUsers);
+    const [users, setUsers] = useState<User[]>([]);
+    const { toast } = useToast();
 
-    const handleSave = (newUser: User) => {
-        if(newUser.id) {
-            setUsers(users.map(u => u.id === newUser.id ? newUser : u));
-        } else {
-             // A real implementation would get a new ID from a database
-            const newId = Math.max(...users.map(u => u.id)) + 1;
-            const userWithId = {
-                ...newUser,
-                id: newId,
-                wallet: { id: newId, userId: newId, balance: 0, totalRecharge: 0, totalWithdrawal: 0 },
-                investments: [],
-                transactions: [],
-                referralsMade: [],
-            };
-            setUsers([...users, userWithId]);
+    useEffect(() => {
+        const unsubscribe = onSnapshot(collection(db, "users"), (snapshot) => {
+            const usersData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id } as User));
+            setUsers(usersData);
+        });
+        return () => unsubscribe();
+    }, []);
+
+    const handleSave = async (updatedUser: User) => {
+        try {
+            if (updatedUser.id) {
+                 const userDocRef = doc(db, "users", updatedUser.id as string);
+                 // We remove the id from the object before saving to firestore
+                 const { id, ...userData } = updatedUser;
+                 await setDoc(userDocRef, userData, { merge: true });
+            } else {
+                // In a real app, adding users would be more complex (e.g. need auth credentials)
+                // This is a simplified version for adding users manually.
+                await addDoc(collection(db, "users"), updatedUser);
+            }
+             toast({
+                title: "User Saved",
+                description: `Details for ${updatedUser.name} have been successfully saved.`,
+            });
+        } catch (error) {
+            console.error("Error saving user: ", error);
+             toast({
+                title: "Save Failed",
+                description: "There was an error saving the user details.",
+                variant: "destructive",
+            });
         }
     }
 
