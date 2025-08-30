@@ -3,24 +3,15 @@ import admin from 'firebase-admin';
 import type { Auth } from 'firebase-admin/auth';
 import type { Firestore } from 'firebase-admin/firestore';
 
-const firebaseConfig = {
-  "projectId": "balenciaga-marketing-rights",
-};
-
 // This function ensures the app is initialized only once.
 const initializeAdminApp = () => {
     if (admin.apps.length > 0) {
         return admin.app();
     }
     try {
-        return admin.initializeApp({
-            credential: admin.credential.cert({
-                projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId,
-                clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-                privateKey: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n'),
-            }),
-            databaseURL: `https://${firebaseConfig.projectId}.firebaseio.com`
-        });
+        // When running in a Google Cloud environment (like Cloud Run for App Hosting),
+        // the SDK can automatically discover the service account credentials.
+        return admin.initializeApp();
     } catch (error) {
         console.error('Firebase admin initialization error', error);
         // We re-throw the error to make it clear that initialization failed.
