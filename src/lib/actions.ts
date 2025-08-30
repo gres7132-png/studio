@@ -1,11 +1,66 @@
 
 'use server';
 
-import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch, addDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch, addDoc, setDoc } from 'firebase/firestore';
 import { db } from './firebase';
 import type { User, Transaction, Investment, Package, Referral, DistributorLevel } from './types';
 import { addDays, formatISO } from 'date-fns';
 import { distributorLevels } from './data';
+import { adminAuth, adminDb } from './firebase';
+
+interface SignUpUserParams {
+    email: string;
+    password?: string;
+    name: string;
+    mobile?: string;
+    referredBy?: string | null;
+}
+
+export async function signUpUser(params: SignUpUserParams): Promise<{ success: boolean; error?: string; uid?: string }> {
+    const { email, password, name, mobile, referredBy } = params;
+
+    try {
+        const userRecord = await adminAuth.createUser({
+            email,
+            emailVerified: false,
+            password,
+            displayName: name,
+            disabled: false,
+        });
+
+        const userData: Omit<User, 'id'> = {
+            uid: userRecord.uid,
+            name,
+            email,
+            mobile: mobile || '',
+            isAdmin: false,
+            referredBy: referredBy || null,
+            createdAt: new Date().toISOString(),
+            wallet: {
+                balance: 0,
+                totalRecharge: 0,
+                totalWithdrawal: 0,
+            },
+            investments: [],
+            referralsMade: [],
+            hasInvested: false,
+            purchasedDividendLevel: null,
+            distributorshipPurchaseDate: null,
+            lastDividendPayoutDate: null,
+        };
+
+        await adminDb.collection('users').doc(userRecord.uid).set(userData);
+        
+        return { success: true, uid: userRecord.uid };
+
+    } catch (error) {
+        console.error('Error signing up user:', error);
+        if (error instanceof Error) {
+            return { success: false, error: error.message };
+        }
+        return { success: false, error: 'An unknown error occurred during sign-up.' };
+    }
+}
 
 
 interface HandleTransactionParams {

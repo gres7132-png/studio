@@ -14,10 +14,10 @@ import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
-import { auth, db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
-import { doc, setDoc } from "firebase/firestore";
+import { signUpUser } from "@/lib/actions";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 export function RegisterForm() {
     const router = useRouter();
@@ -37,50 +37,32 @@ export function RegisterForm() {
     async function register(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            
-            await updateProfile(user, {
-                displayName: name,
-            });
+        
+        const result = await signUpUser({
+            email,
+            password,
+            name,
+            mobile,
+            referredBy: referrerCode || null,
+        });
 
-            await setDoc(doc(db, "users", user.uid), {
-                uid: user.uid,
-                name: name,
-                email: email,
-                mobile: mobile,
-                isAdmin: false,
-                referredBy: referrerCode || null,
-                createdAt: new Date().toISOString(),
-                wallet: {
-                    balance: 0,
-                    totalRecharge: 0,
-                    totalWithdrawal: 0,
-                },
-                investments: [],
-                referralsMade: [],
-                hasInvested: false,
-                purchasedDividendLevel: null,
-                distributorshipPurchaseDate: null,
-                lastDividendPayoutDate: null,
-            });
-            
+        if (result.success) {
             toast({
                 title: "Account Created",
-                description: "Welcome! We're redirecting you to your dashboard.",
+                description: "Welcome! We're signing you in.",
             });
-
+            // Sign in the user after successful registration
+            await signInWithEmailAndPassword(auth, email, password);
             router.push('/dashboard');
-        } catch (error: any) {
+        } else {
              toast({
                 title: "Registration Failed",
-                description: error.message,
+                description: result.error,
                 variant: "destructive"
             });
-        } finally {
-            setLoading(false);
         }
+        
+        setLoading(false);
     }
 
   return (
