@@ -6,7 +6,7 @@ import { db } from './firebase';
 import type { User, Transaction, Investment, Package, Referral, DistributorLevel } from './types';
 import { addDays, formatISO } from 'date-fns';
 import { distributorLevels } from './data';
-import { adminAuth, adminDb } from './firebase';
+import { adminAuth, adminDb } from './firebase-admin';
 
 interface SignUpUserParams {
     email: string;
