@@ -61,6 +61,9 @@ export function RegisterForm() {
                 investments: [],
                 referralsMade: [],
                 hasInvested: false,
+                purchasedDividendLevel: null,
+                distributorshipPurchaseDate: null,
+                lastDividendPayoutDate: null,
             });
             
             toast({

@@ -13,25 +13,20 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-let app: FirebaseApp;
-let auth: Auth;
-let db: Firestore;
-
-// This ensures that Firebase is only initialized on the client-side.
-if (typeof window !== 'undefined') {
+// This function initializes and returns the Firebase app instance, ensuring it's a singleton.
+const getFirebaseApp = (): FirebaseApp => {
   if (getApps().length === 0) {
-    if (firebaseConfig.apiKey) {
-        app = initializeApp(firebaseConfig);
-        auth = getAuth(app);
-        db = getFirestore(app);
-    } else {
-        console.error("Firebase API Key is missing. Firebase could not be initialized.");
+    if (!firebaseConfig.apiKey) {
+        throw new Error("Firebase API Key is missing. Firebase could not be initialized.");
     }
+    return initializeApp(firebaseConfig);
   } else {
-    app = getApp();
-    auth = getAuth(app);
-    db = getFirestore(app);
+    return getApp();
   }
-}
+};
+
+const app = getFirebaseApp();
+const auth = getAuth(app);
+const db = getFirestore(app);
 
 export { app, auth, db };
