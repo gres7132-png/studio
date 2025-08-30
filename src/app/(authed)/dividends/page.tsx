@@ -171,7 +171,7 @@ export default function DividendsPage() {
                                     <AlertDialogTitle>Confirm Purchase</AlertDialogTitle>
                                     <AlertDialogDescription>
                                         Are you sure you want to purchase the "{level.level}" distributorship for Ksh {level.purchasePrice.toLocaleString()}? This amount will be deducted from your wallet balance.
-                                    </Aler tDialogDescription>
+                                    </AlertDialogDescription>
                                     </AlertDialogHeader>
                                     <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
