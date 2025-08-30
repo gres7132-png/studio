@@ -21,14 +21,22 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
-if (typeof window !== 'undefined' && !getApps().length) {
-    app = initializeApp(firebaseConfig);
-    auth = getAuth(app);
-    db = getFirestore(app);
-} else if (getApps().length) {
-    app = getApps()[0];
-    auth = getAuth(app);
-    db = getFirestore(app);
+
+if (typeof window !== 'undefined') {
+    if (getApps().length === 0) {
+        if (firebaseConfig.apiKey) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } else {
+            console.error("Firebase API Key is missing. Firebase could not be initialized.");
+        }
+    } else {
+        app = getApps()[0];
+        auth = getAuth(app);
+        db = getFirestore(app);
+    }
 }
+
 
 export { app, auth, db };
