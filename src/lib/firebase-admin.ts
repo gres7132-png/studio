@@ -8,14 +8,16 @@ const initializeAdminApp = () => {
     if (admin.apps.length > 0) {
         return admin.app();
     }
+    
+    // In a real deployed environment (like Firebase App Hosting), 
+    // the SDK automatically discovers the service account credentials.
+    // No manual configuration is needed.
     try {
-        // When running in a Google Cloud environment (like Cloud Run for App Hosting),
-        // the SDK can automatically discover the service account credentials.
         return admin.initializeApp();
     } catch (error) {
         console.error('Firebase admin initialization error', error);
         // We re-throw the error to make it clear that initialization failed.
-        throw new Error('Failed to initialize Firebase Admin SDK.');
+        throw new Error('Failed to initialize Firebase Admin SDK. Ensure the server environment has the correct permissions.');
     }
 };
 
