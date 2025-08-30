@@ -87,6 +87,8 @@ export async function handleTransactionApproval(params: HandleTransactionApprova
                     });
                 } else if (txData.type === 'withdrawal') {
                      const user = userDoc.data() as User;
+                     const facilitationFee = txData.amount * 0.15;
+                     const finalAmount = txData.amount - facilitationFee;
                      if (user.wallet.balance < txData.amount) {
                          throw new Error('User has insufficient balance for this withdrawal.');
                      }

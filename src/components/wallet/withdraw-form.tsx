@@ -31,6 +31,10 @@ export function WithdrawForm({ currentBalance }: WithdrawFormProps) {
       toast({ title: "Insufficient balance.", variant: "destructive" });
       return;
     }
+     if (parseFloat(amount) < 100) {
+      toast({ title: "Minimum withdrawal is Ksh 100.", variant: "destructive" });
+      return;
+    }
     
     setLoading(true);
     const result = await handleTransaction({
