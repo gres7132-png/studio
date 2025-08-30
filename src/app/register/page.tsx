@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { auth, db } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
@@ -28,7 +28,11 @@ export default function RegisterPage() {
     const [mobile, setMobile] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
-    const [referrerCode, setReferrerCode] = useState(searchParams.get('ref') || '');
+    const [referrerCode, setReferrerCode] = useState('');
+
+    useEffect(() => {
+        setReferrerCode(searchParams.get('ref') || '');
+    }, [searchParams]);
 
     async function register(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
