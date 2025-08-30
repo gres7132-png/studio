@@ -15,23 +15,29 @@ export default function AdminLayout({
     const [isAdmin, setIsAdmin] = React.useState(false);
 
     React.useEffect(() => {
-        // Check sessionStorage for our special admin flag
-        const isPredeterminedAdmin = sessionStorage.getItem('isAdmin') === 'true';
-        
-        // Check firebase-authenticated user's email
+        // Check sessionStorage for our special admin flag first.
+        // This is set on the login page for the predetermined admin.
+        const isSessionAdmin = sessionStorage.getItem('isAdmin') === 'true';
+
+        // Then, check if the authenticated Firebase user has an admin email.
         const isEmailAdmin = !loading && user?.email && ADMIN_EMAILS.includes(user.email);
+        
+        const hasAdminAccess = isSessionAdmin || isEmailAdmin;
 
-        const hasAdminAccess = isPredeterminedAdmin || isEmailAdmin;
-        setIsAdmin(hasAdminAccess);
-
-        if (!loading && !hasAdminAccess) {
-           router.push('/dashboard');
+        if (!loading) {
+            if (hasAdminAccess) {
+                setIsAdmin(true);
+            } else {
+                // If not loading and not an admin, redirect away.
+                router.push('/dashboard');
+            }
         }
     }, [user, loading, router]);
     
-    // While loading or if user is not determined to be admin yet, show loading
+    // While loading or if user is not determined to be admin yet, show a loading screen.
+    // The useEffect hook will handle the redirect if they are not an admin.
     if (loading || !isAdmin) {
-        return <div className="flex justify-center items-center h-screen">Loading...</div>;
+        return <div className="flex justify-center items-center h-screen">Loading Admin Panel...</div>;
     }
 
     return (
