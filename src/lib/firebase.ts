@@ -21,7 +21,6 @@ let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
-
 if (typeof window !== 'undefined') {
     if (getApps().length === 0) {
         if (firebaseConfig.apiKey) {
