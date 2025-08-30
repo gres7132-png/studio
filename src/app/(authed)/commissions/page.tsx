@@ -20,7 +20,7 @@ import type { Referral } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 
 export default function CommissionsPage() {
-  const { user, authUser } = useAuth();
+  const { user, authUser } from useAuth();
   const { toast } = useToast();
   
   const referralsMade: Referral[] = user?.referralsMade || [];

@@ -18,7 +18,7 @@ interface PackagesListProps {
 export function PackagesList({ packages }: PackagesListProps) {
     const { authUser } = useAuth();
     const { toast } = useToast();
-    const [loadingPackageId, setLoadingPackageId] = useState<number | null>(null);
+    const [loadingPackageId, setLoadingPackageId] = useState<string | null>(null);
 
     const onPurchase = async (pkg: Package) => {
         if (!authUser) {

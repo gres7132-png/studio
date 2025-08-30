@@ -1,3 +1,4 @@
+
 'use server';
 
 import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch, addDoc } from 'firebase/firestore';
@@ -123,93 +124,91 @@ export async function handleInvestment(params: HandleInvestmentParams): Promise<
     const userDocRef = doc(db, 'users', userId);
 
     try {
-        const batch = writeBatch(db);
+        await runTransaction(db, async (transaction) => {
+            const packageDoc = await transaction.get(packageDocRef);
+            const userDoc = await transaction.get(userDocRef);
 
-        const packageDoc = await getDoc(packageDocRef);
-        const userDoc = await getDoc(userDocRef);
-
-        if (!packageDoc.exists()) {
-            throw new Error("Invalid package selected.");
-        }
-        if (!userDoc.exists()) {
-            throw new Error("User not found.");
-        }
-        
-        const pkg = { ...packageDoc.data(), id: packageDoc.id } as Package;
-        const user = userDoc.data() as User;
-
-        if (user.wallet.balance < pkg.price) {
-            throw new Error("Insufficient wallet balance for this purchase.");
-        }
-
-        const now = new Date();
-        const newInvestment: Investment = {
-            id: Date.now(),
-            userId: user.uid,
-            packageId: pkg.id,
-            package: pkg,
-            amount: pkg.price,
-            startDate: formatISO(now),
-            endDate: formatISO(addDays(now, pkg.durationDays)),
-            status: 'active',
-            earnings: 0,
-            createdAt: formatISO(now),
-        };
-
-        const investmentTransactionData: Omit<Transaction, 'id'> = {
-            userId: user.uid,
-            type: 'investment',
-            amount: pkg.price,
-            status: 'success',
-            paymentMethod: 'wallet',
-            createdAt: formatISO(now),
-        };
-
-        const newTransactionRef = doc(collection(db, 'transactions'));
-        batch.set(newTransactionRef, investmentTransactionData);
-
-        batch.update(userDocRef, {
-            'wallet.balance': increment(-pkg.price),
-            investments: arrayUnion(newInvestment),
-            hasInvested: true
-        });
-
-        // Handle referral commission if it's the user's first investment
-        if (!user.hasInvested && user.referredBy) {
-            const referrerDocRef = doc(db, 'users', user.referredBy);
-            const referrerDoc = await getDoc(referrerDocRef);
-
-            if (referrerDoc.exists()) {
-                const commissionAmount = pkg.price * 0.05;
-                const commissionTransactionData: Omit<Transaction, 'id'> = {
-                    userId: user.referredBy,
-                    type: 'commission',
-                    amount: commissionAmount,
-                    status: 'success',
-                    paymentMethod: `Referral: ${user.name}`,
-                    createdAt: formatISO(now),
-                };
-                
-                const newCommissionRef = doc(collection(db, 'transactions'));
-                batch.set(newCommissionRef, commissionTransactionData);
-                
-                const newReferral: Referral = {
-                    id: user.uid,
-                    referrerId: user.referredBy,
-                    referredId: user.uid,
-                    referred: { name: user.name, email: user.email },
-                    commissionAmount,
-                    createdAt: formatISO(now),
-                };
-
-                batch.update(referrerDocRef, {
-                    'wallet.balance': increment(commissionAmount),
-                    referralsMade: arrayUnion(newReferral)
-                });
+            if (!packageDoc.exists()) {
+                throw new Error("Invalid package selected.");
             }
-        }
-        
-        await batch.commit();
+            if (!userDoc.exists()) {
+                throw new Error("User not found.");
+            }
+            
+            const pkg = { ...packageDoc.data(), id: packageDoc.id } as Package;
+            const user = userDoc.data() as User;
+
+            if (user.wallet.balance < pkg.price) {
+                throw new Error("Insufficient wallet balance for this purchase.");
+            }
+
+            const now = new Date();
+            const newInvestment: Investment = {
+                id: Date.now(),
+                userId: user.uid,
+                packageId: pkg.id,
+                package: pkg,
+                amount: pkg.price,
+                startDate: formatISO(now),
+                endDate: formatISO(addDays(now, pkg.durationDays)),
+                status: 'active',
+                earnings: 0,
+                createdAt: formatISO(now),
+            };
+
+            const investmentTransactionData: Omit<Transaction, 'id'> = {
+                userId: user.uid,
+                type: 'investment',
+                amount: pkg.price,
+                status: 'success',
+                paymentMethod: 'wallet',
+                createdAt: formatISO(now),
+            };
+
+            const newTransactionRef = doc(collection(db, 'transactions'));
+            transaction.set(newTransactionRef, investmentTransactionData);
+
+            transaction.update(userDocRef, {
+                'wallet.balance': increment(-pkg.price),
+                investments: arrayUnion(newInvestment),
+                hasInvested: true
+            });
+
+            // Handle referral commission if it's the user's first investment
+            if (!user.hasInvested && user.referredBy) {
+                const referrerDocRef = doc(db, 'users', user.referredBy);
+                const referrerDoc = await transaction.get(referrerDocRef);
+
+                if (referrerDoc.exists()) {
+                    const commissionAmount = pkg.price * 0.05;
+                    const commissionTransactionData: Omit<Transaction, 'id'> = {
+                        userId: user.referredBy,
+                        type: 'commission',
+                        amount: commissionAmount,
+                        status: 'success',
+                        paymentMethod: `Referral: ${user.name}`,
+                        createdAt: formatISO(now),
+                    };
+                    
+                    const newCommissionRef = doc(collection(db, 'transactions'));
+                    transaction.set(newCommissionRef, commissionTransactionData);
+                    
+                    const newReferral: Referral = {
+                        id: user.uid,
+                        referrerId: user.referredBy,
+                        referredId: user.uid,
+                        referred: { name: user.name, email: user.email },
+                        commissionAmount,
+                        createdAt: formatISO(now),
+                    };
+
+                    transaction.update(referrerDocRef, {
+                        'wallet.balance': increment(commissionAmount),
+                        referralsMade: arrayUnion(newReferral)
+                    });
+                }
+            }
+        });
 
         return { success: true };
     } catch (error) {
@@ -344,5 +343,3 @@ export async function handleDividendPayout(userId: string): Promise<{ success: b
         return { success: false, error: 'An unknown error occurred during the dividend payout.' };
     }
 }
-
-    
