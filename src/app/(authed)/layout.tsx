@@ -29,25 +29,27 @@ import { auth } from '@/lib/firebase';
 import { useRouter } from 'next/navigation';
 
 function AppLayoutContent({ children }: { children: React.ReactNode }) {
-  const { user } = useAuth();
+  const { authUser, user, loading } = useAuth();
   const router = useRouter();
 
   React.useEffect(() => {
-    if (!user) {
+    if (!loading && !authUser) {
       router.push('/login');
     }
-  }, [user, router]);
+  }, [authUser, loading, router]);
   
   const handleLogout = async () => {
     await auth.signOut();
     router.push('/login');
   };
 
-  if (!user) {
-    return null; // Or a loading spinner
+  // If the auth state is loading OR the user object from firestore hasn't been loaded yet,
+  // we can show a null state, and the loading screen from AuthProvider will be displayed.
+  if (loading || !user || !authUser) {
+    return null; 
   }
 
-  const userInitial = user.displayName ? user.displayName.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
+  const userInitial = user.name ? user.name.charAt(0) : (user.email ? user.email.charAt(0) : 'U');
 
   return (
     <SidebarProvider>
@@ -87,7 +89,7 @@ function AppLayoutContent({ children }: { children: React.ReactNode }) {
             <DropdownMenuContent align="end">
               <DropdownMenuLabel className='font-normal'>
                 <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">{user.displayName || 'User'}</p>
+                  <p className="text-sm font-medium leading-none">{user.name || 'User'}</p>
                   <p className="text-xs leading-none text-muted-foreground">
                     {user.email}
                   </p>
