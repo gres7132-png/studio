@@ -1,9 +1,9 @@
 
 'use client';
 // Import the functions you need from the SDKs you need
-import { initializeApp, getApps, getApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
+import { getAuth, Auth } from "firebase/auth";
+import { getFirestore, Firestore } from "firebase/firestore";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -16,26 +16,19 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
-let app;
-let auth;
-let db;
+// Initialize Firebase for client side
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
-// This check is to prevent the app from crashing when the server is rendering
-// and the environment variables are not available.
-if (firebaseConfig.apiKey && typeof window !== 'undefined') {
-    if (!getApps().length) {
-      app = initializeApp(firebaseConfig);
-    } else {
-      app = getApps()[0];
-    }
-    
+if (typeof window !== 'undefined' && !getApps().length) {
+    app = initializeApp(firebaseConfig);
     auth = getAuth(app);
     db = getFirestore(app);
-
-} else {
-    auth = {} as any;
-    db = {} as any;
+} else if (getApps().length) {
+    app = getApps()[0];
+    auth = getAuth(app);
+    db = getFirestore(app);
 }
 
 export { app, auth, db };
