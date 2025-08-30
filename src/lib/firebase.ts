@@ -1,8 +1,10 @@
 
+'use client';
 // Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
+import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -17,18 +19,30 @@ const firebaseConfig = {
 
 // Initialize Firebase
 let app;
+let auth;
+let db;
 
 // This check is to prevent the app from crashing when the server is rendering
 // and the environment variables are not available.
-if (firebaseConfig.apiKey) {
+if (firebaseConfig.apiKey && typeof window !== 'undefined') {
     if (!getApps().length) {
       app = initializeApp(firebaseConfig);
     } else {
       app = getApps()[0];
     }
-}
+    
+    // Initialize App Check
+    initializeAppCheck(app, {
+        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!),
+        isTokenAutoRefreshEnabled: true
+    });
 
-const auth = app ? getAuth(app) : ({} as any);
-const db = app ? getFirestore(app) : ({} as any);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+} else {
+    auth = {} as any;
+    db = {} as any;
+}
 
 export { app, auth, db };
