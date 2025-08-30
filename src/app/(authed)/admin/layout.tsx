@@ -3,9 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import React from "react";
-
-// This is a placeholder. In a real app, you'd fetch this from your database.
-const mockAdminEmails = ['admin@example.com', 'balenciaga-admin@example.com'];
+import { ADMIN_EMAILS } from "@/lib/config";
 
 export default function AdminLayout({
     children,
@@ -16,12 +14,12 @@ export default function AdminLayout({
     const router = useRouter();
 
     React.useEffect(() => {
-        if (!loading && (!user || (user.email && !mockAdminEmails.includes(user.email)))) {
+        if (!loading && (!user || (user.email && !ADMIN_EMAILS.includes(user.email)))) {
            router.push('/dashboard');
         }
     }, [user, loading, router]);
 
-    if (loading || !user || (user.email && !mockAdminEmails.includes(user.email))) {
+    if (loading || !user || (user.email && !ADMIN_EMAILS.includes(user.email))) {
         return <div className="flex justify-center items-center h-screen">Loading...</div>;
     }
 

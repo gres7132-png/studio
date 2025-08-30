@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
 import { Skeleton } from '../ui/skeleton';
+import { ADMIN_EMAILS } from '@/lib/config';
 
 interface SidebarNavProps {}
 
@@ -36,9 +37,6 @@ const navItems = [
   { href: '/wallet', label: 'Wallet', icon: Wallet },
   { href: '/account', label: 'Account', icon: Settings },
 ];
-
-// This is a placeholder. In a real app, you'd fetch this from your database.
-const mockAdminEmails = ['admin@example.com', 'balenciaga-admin@example.com'];
 
 const adminNavItems = [
   { href: '/admin/dashboard', label: 'Admin Dashboard', icon: Shield },
@@ -54,7 +52,7 @@ export function SidebarNav({}: SidebarNavProps) {
   
   // A real implementation would check a user's role from a database.
   // For now, we'll check against a hardcoded list of admin emails.
-  const isAdmin = user?.email ? mockAdminEmails.includes(user.email) : false;
+  const isAdmin = user?.email ? ADMIN_EMAILS.includes(user.email) : false;
 
   const handleLinkClick = () => {
     setOpenMobile(false);
