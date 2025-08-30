@@ -1,4 +1,3 @@
-
 'use client';
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
@@ -13,20 +12,28 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// This function initializes and returns the Firebase app instance, ensuring it's a singleton.
-const getFirebaseApp = (): FirebaseApp => {
-  if (getApps().length === 0) {
-    if (!firebaseConfig.apiKey) {
-        throw new Error("Firebase API Key is missing. Firebase could not be initialized.");
-    }
-    return initializeApp(firebaseConfig);
-  } else {
-    return getApp();
-  }
-};
+// Initialize Firebase
+let app: FirebaseApp;
+let auth: Auth;
+let db: Firestore;
 
-const app = getFirebaseApp();
-const auth = getAuth(app);
-const db = getFirestore(app);
+if (typeof window !== 'undefined') {
+    if (getApps().length === 0) {
+        if (!firebaseConfig.apiKey) {
+            throw new Error("Firebase API Key is missing. Firebase could not be initialized.");
+        }
+        app = initializeApp(firebaseConfig);
+    } else {
+        app = getApps()[0];
+    }
+    auth = getAuth(app);
+    db = getFirestore(app);
+} else {
+    // Handle server-side case gracefully if needed, though most auth/db usage will be client-side.
+    // For this app, we prevent initialization on the server.
+}
+
 
 export { app, auth, db };
+
+    

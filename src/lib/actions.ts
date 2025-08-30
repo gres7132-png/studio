@@ -1,4 +1,3 @@
-
 'use server';
 
 import { doc, updateDoc, getDoc, arrayUnion, increment, runTransaction, collection, query, where, getDocs, writeBatch, addDoc } from 'firebase/firestore';
@@ -345,3 +344,5 @@ export async function handleDividendPayout(userId: string): Promise<{ success: b
         return { success: false, error: 'An unknown error occurred during the dividend payout.' };
     }
 }
+
+    
