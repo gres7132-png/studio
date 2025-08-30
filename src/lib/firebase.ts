@@ -1,4 +1,4 @@
-'use client';
+
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
@@ -12,7 +12,7 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase
+// Initialize Firebase for client-side
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
@@ -20,7 +20,8 @@ let db: Firestore;
 if (typeof window !== 'undefined') {
     if (getApps().length === 0) {
         if (!firebaseConfig.apiKey) {
-            throw new Error("Firebase API Key is missing. Firebase could not be initialized.");
+            // This error will be thrown on the client if keys are missing
+            throw new Error("Firebase API Key is missing in .env.local. Firebase could not be initialized.");
         }
         app = initializeApp(firebaseConfig);
     } else {
@@ -28,12 +29,6 @@ if (typeof window !== 'undefined') {
     }
     auth = getAuth(app);
     db = getFirestore(app);
-} else {
-    // Handle server-side case gracefully if needed, though most auth/db usage will be client-side.
-    // For this app, we prevent initialization on the server.
 }
 
-
 export { app, auth, db };
-
-    

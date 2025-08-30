@@ -17,6 +17,7 @@ import { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "@/lib/firebase";
 import { useToast } from "@/hooks/use-toast";
+import { PREDETERMINED_ADMIN } from "@/lib/config";
 
 export default function LoginPage() {
     const router = useRouter();
@@ -28,6 +29,22 @@ export default function LoginPage() {
     async function login(e: React.FormEvent<HTMLFormElement>) {
         e.preventDefault();
         setLoading(true);
+
+        // Check for predetermined admin credentials
+        if (email === PREDETERMINED_ADMIN.email && password === PREDETERMINED_ADMIN.password) {
+            // In a real app, you'd set a secure session/token here.
+            // For this prototype, we'll use sessionStorage to simulate an admin login.
+            sessionStorage.setItem('isAdmin', 'true');
+            toast({
+                title: "Admin Login Successful",
+                description: `Welcome, ${PREDETERMINED_ADMIN.name}!`,
+            });
+            router.push('/admin/dashboard');
+            setLoading(false);
+            return;
+        }
+
+
         try {
             await signInWithEmailAndPassword(auth, email, password);
             router.push('/dashboard');
@@ -86,7 +103,7 @@ export default function LoginPage() {
               </Link>
             </div>
              <div className="mt-4 text-center text-xs text-muted-foreground">
-              Admins should sign up using their designated admin email and log in here.
+              Admins can log in using their predetermined credentials.
             </div>
           </CardFooter>
         </Card>

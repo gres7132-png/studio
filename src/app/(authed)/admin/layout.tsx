@@ -12,17 +12,27 @@ export default function AdminLayout({
 }) {
     const { user, loading } = useAuth();
     const router = useRouter();
+    const [isAdmin, setIsAdmin] = React.useState(false);
 
     React.useEffect(() => {
-        if (!loading && (!user || (user.email && !ADMIN_EMAILS.includes(user.email)))) {
+        // Check sessionStorage for our special admin flag
+        const isPredeterminedAdmin = sessionStorage.getItem('isAdmin') === 'true';
+        
+        // Check firebase-authenticated user's email
+        const isEmailAdmin = !loading && user?.email && ADMIN_EMAILS.includes(user.email);
+
+        const hasAdminAccess = isPredeterminedAdmin || isEmailAdmin;
+        setIsAdmin(hasAdminAccess);
+
+        if (!loading && !hasAdminAccess) {
            router.push('/dashboard');
         }
     }, [user, loading, router]);
-
-    if (loading || !user || (user.email && !ADMIN_EMAILS.includes(user.email))) {
+    
+    // While loading or if user is not determined to be admin yet, show loading
+    if (loading || !isAdmin) {
         return <div className="flex justify-center items-center h-screen">Loading...</div>;
     }
-
 
     return (
         <div className="space-y-8">
