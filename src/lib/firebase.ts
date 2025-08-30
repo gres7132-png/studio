@@ -4,7 +4,6 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
-import { initializeAppCheck, ReCaptchaV3Provider } from "firebase/app-check";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -31,12 +30,6 @@ if (firebaseConfig.apiKey && typeof window !== 'undefined') {
       app = getApps()[0];
     }
     
-    // Initialize App Check
-    initializeAppCheck(app, {
-        provider: new ReCaptchaV3Provider(process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY!),
-        isTokenAutoRefreshEnabled: true
-    });
-
     auth = getAuth(app);
     db = getFirestore(app);
 
