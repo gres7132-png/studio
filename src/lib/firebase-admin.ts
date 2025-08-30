@@ -1,21 +1,19 @@
 
 import admin from 'firebase-admin';
-
-// This is a server-only file.
+import type { Auth } from 'firebase-admin/auth';
+import type { Firestore } from 'firebase-admin/firestore';
 
 const firebaseConfig = {
   "projectId": "balenciaga-marketing-rights",
-  "appId": "1:27339502819:web:f86084b6f225c001df81d6",
-  "storageBucket": "balenciaga-marketing-rights.firebasestorage.app",
-  "apiKey": "AIzaSyB1Vv--6RrOLhbfhAynO01CTP-T-fXNUi8",
-  "authDomain": "balenciaga-marketing-rights.firebaseapp.com",
-  "messagingSenderId": "27339502819"
 };
 
-
-if (!admin.apps.length) {
+// This function ensures the app is initialized only once.
+const initializeAdminApp = () => {
+    if (admin.apps.length > 0) {
+        return admin.app();
+    }
     try {
-        admin.initializeApp({
+        return admin.initializeApp({
             credential: admin.credential.cert({
                 projectId: process.env.FIREBASE_PROJECT_ID || firebaseConfig.projectId,
                 clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
@@ -25,9 +23,21 @@ if (!admin.apps.length) {
         });
     } catch (error) {
         console.error('Firebase admin initialization error', error);
+        // We re-throw the error to make it clear that initialization failed.
+        throw new Error('Failed to initialize Firebase Admin SDK.');
     }
+};
+
+// We now export functions that get the services, ensuring initialization has occurred.
+function getAdminAuth(): Auth {
+    initializeAdminApp();
+    return admin.auth();
 }
 
+function getAdminDb(): Firestore {
+    initializeAdminApp();
+    return admin.firestore();
+}
 
-export const adminAuth = admin.auth();
-export const adminDb = admin.firestore();
+export const adminAuth = getAdminAuth();
+export const adminDb = getAdminDb();
