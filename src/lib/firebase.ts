@@ -1,12 +1,9 @@
 
 'use client';
-// Import the functions you need from the SDKs you need
 import { initializeApp, getApps, getApp, FirebaseApp } from "firebase/app";
 import { getAuth, Auth } from "firebase/auth";
 import { getFirestore, Firestore } from "firebase/firestore";
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -16,26 +13,25 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID
 };
 
-// Initialize Firebase for client side
 let app: FirebaseApp;
 let auth: Auth;
 let db: Firestore;
 
+// This ensures that Firebase is only initialized on the client-side.
 if (typeof window !== 'undefined') {
-    if (getApps().length === 0) {
-        if (firebaseConfig.apiKey) {
-            app = initializeApp(firebaseConfig);
-            auth = getAuth(app);
-            db = getFirestore(app);
-        } else {
-            console.error("Firebase API Key is missing. Firebase could not be initialized.");
-        }
-    } else {
-        app = getApps()[0];
+  if (getApps().length === 0) {
+    if (firebaseConfig.apiKey) {
+        app = initializeApp(firebaseConfig);
         auth = getAuth(app);
         db = getFirestore(app);
+    } else {
+        console.error("Firebase API Key is missing. Firebase could not be initialized.");
     }
+  } else {
+    app = getApp();
+    auth = getAuth(app);
+    db = getFirestore(app);
+  }
 }
-
 
 export { app, auth, db };
