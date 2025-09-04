@@ -1,6 +1,7 @@
 
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -23,19 +24,32 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for referred users has been removed. 
-// In a real application, this would be fetched from Firestore.
-const referredUsers: any[] = [];
+// Mock data for referred users. 
+// In a real application, this would be fetched from your backend database (e.g., Firestore).
+const mockReferredUsers = [
+  { id: '1', name: 'Alice Johnson', capital: 50000, commission: 2500, status: 'Active' },
+  { id: '2', name: 'Bob Williams', capital: 0, commission: 0, status: 'Pending' },
+  { id: '3', name: 'Charlie Brown', capital: 120000, commission: 6000, status: 'Active' },
+  { id: '4', name: 'Diana Miller', capital: 75000, commission: 3750, status: 'Active' },
+];
+
 
 export default function ReferralsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [referralLink, setReferralLink] = useState("");
+  
+  // In a real app, you would fetch this data from your backend.
+  const referredUsers = mockReferredUsers;
 
-  const referralLink = user
-    ? `${window.location.origin}/auth?ref=${user.uid}`
-    : "";
+  useEffect(() => {
+    if (user) {
+      setReferralLink(`${window.location.origin}/auth?ref=${user.uid}`);
+    }
+  }, [user]);
 
   const copyToClipboard = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink);
     toast({
       title: "Copied!",
@@ -66,7 +80,7 @@ export default function ReferralsPage() {
             <p className="flex-grow text-sm truncate text-muted-foreground">
               {referralLink || "Loading your link..."}
             </p>
-            <Button size="icon" variant="ghost" onClick={copyToClipboard} disabled={!user}>
+            <Button size="icon" variant="ghost" onClick={copyToClipboard} disabled={!referralLink}>
               <Copy className="h-4 w-4" />
             </Button>
           </div>
