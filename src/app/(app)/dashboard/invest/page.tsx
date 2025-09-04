@@ -12,18 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
-
-// This would come from your database, and userBalance would be fetched for the logged-in user.
-const silverLevelPackages = [
-  { name: "Silver Level 1", price: 1300, dailyReturn: 166, duration: 16, totalReturn: 2656 },
-  { name: "Silver Level 2", price: 2800, dailyReturn: 393, duration: 15, totalReturn: 5895 },
-  { name: "Silver Level 3", price: 3900, dailyReturn: 242, duration: 35, totalReturn: 8470 },
-  { name: "Silver Level 4", price: 9750, dailyReturn: 318, duration: 70, totalReturn: 22260 },
-  { name: "Silver Level 5", price: 20800, dailyReturn: 390, duration: 130, totalReturn: 50700 },
-  { name: "Silver Level 6", price: 39000, dailyReturn: 512, duration: 200, totalReturn: 102400 },
-  { name: "Silver Level 7", price: 65000, dailyReturn: 670, duration: 260, totalReturn: 174200 },
-  { name: "Silver Level 8", price: 117000, dailyReturn: 1002, duration: 360, totalReturn: 360720 },
-];
+import { silverLevelPackages } from "@/lib/config";
 
 const userBalance = 0; // This should be fetched from your backend.
 

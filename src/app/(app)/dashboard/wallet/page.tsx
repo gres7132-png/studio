@@ -33,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { depositDetails } from "@/lib/config";
 
 const withdrawableBalance = 0; // Set to 0 as per previous changes
 
@@ -63,17 +64,6 @@ const bankingDetailsSchema = z.object({
 const depositSchema = z.object({
     transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
 });
-
-// Placeholder for admin-provided details
-const depositDetails = {
-    mobileMoney: "N/A",
-    crypto: {
-        BTC: "N/A",
-        ETH: "N/A",
-        USDT: "N/A",
-    },
-    minipay: "N/A",
-};
 
 export default function WalletPage() {
   const { toast } = useToast();
@@ -366,4 +356,3 @@ function DollarSignIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
-    

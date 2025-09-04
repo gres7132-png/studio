@@ -22,15 +22,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-
-// The figures are now in KES and will be converted to USD for display.
-const distributorTiers = [
-  { level: 'V1', monthlyIncome: 6500, purchasedProducts: 2, deposit: 39000 },
-  { level: 'V2', monthlyIncome: 13000, purchasedProducts: 3, deposit: 78000 },
-  { level: 'V3', monthlyIncome: 26000, purchasedProducts: 4, deposit: 156000 },
-  { level: 'V4', monthlyIncome: 43333, purchasedProducts: 5, deposit: 260000 },
-  { level: 'V5', monthlyIncome: 108333, purchasedProducts: 6, deposit: 650000 },
-];
+import { distributorTiers } from "@/lib/config";
 
 // Mock data to simulate whether the user has met the prerequisite.
 // In a real application, this would be determined by checking the database.

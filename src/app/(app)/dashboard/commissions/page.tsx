@@ -16,20 +16,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users } from "lucide-react";
-
-// The figures are in KES.
-const commissionTiers = [
-  { referrals: 20, commission: 6500 },
-  { referrals: 75, commission: 20000 },
-  { referrals: 200, commission: 35000 },
-  { referrals: 500, commission: 55000 },
-  { referrals: 1000, commission: 120000 },
-  { referrals: 2000, commission: 300000 },
-];
+import { commissionTiers } from "@/lib/config";
 
 // Mock data to simulate the user's current referral count.
 // In a real application, this would be determined by checking the database
