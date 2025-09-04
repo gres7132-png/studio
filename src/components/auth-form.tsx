@@ -103,8 +103,8 @@ export function AuthForm() {
         });
       }
       toast({
-        title: "Account Created",
-        description: "You have successfully signed up.",
+        title: "Welcome!",
+        description: "Your account has been created successfully.",
       });
       router.push("/dashboard");
     } catch (error: any)
