@@ -67,19 +67,15 @@ export default function ProfilePage() {
             <CardHeader>
               <CardTitle>Personal Information</CardTitle>
               <CardDescription>
-                Update your photo and personal details here.
+                Update your personal details here.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src="https://picsum.photos/200/200" data-ai-hint="person face" />
+                  <AvatarImage src="https://picsum.photos/200" data-ai-hint="person face" />
                   <AvatarFallback>U</AvatarFallback>
                 </Avatar>
-                <div className="space-y-1">
-                    <Button type="button">Change Photo</Button>
-                    <p className="text-xs text-muted-foreground">JPG, GIF or PNG. 1MB max.</p>
-                </div>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
                 <FormField
