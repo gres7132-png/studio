@@ -1,16 +1,15 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User, getAuth, Auth } from "firebase/auth";
-import { getApp, getApps, initializeApp } from "firebase/app";
-import { firebaseConfig } from "@/lib/firebase";
+import { onAuthStateChanged, User, Auth } from "firebase/auth";
+import { auth } from "@/lib/firebase";
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 // --- Admin Configuration ---
 // Add the email addresses of admin users to this array.
 // This is a simple and secure way to manage roles for a small number of admins.
-const ADMIN_EMAILS = ["gres7132@gmail.com"]; // Replace with your actual admin email
+const ADMIN_EMAILS = ["gres7132@gmail.com"];
 
 interface AuthContextType {
   user: User | null;
@@ -18,10 +17,6 @@ interface AuthContextType {
   auth: Auth;
   isAdmin: boolean; // Flag to indicate if the user is an admin
 }
-
-// Initialize Firebase on the client side
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 const AuthContext = createContext<AuthContextType>({
   user: null,

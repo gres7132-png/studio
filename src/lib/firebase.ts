@@ -1,3 +1,7 @@
+// Import the functions you need from the SDKs you need
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getAuth } from "firebase/auth";
+
 // Your web app's Firebase configuration
 // This object is used to connect to your Firebase project.
 export const firebaseConfig = {
@@ -8,3 +12,10 @@ export const firebaseConfig = {
   messagingSenderId: "231100893920",
   appId: "1:231100893920:web:c6e5fb9a41984b4f85de85"
 };
+
+// Initialize Firebase for client-side usage
+// This pattern prevents re-initializing the app on every hot-reload
+const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
+const auth = getAuth(app);
+
+export { app, auth };
