@@ -89,8 +89,6 @@ export default function WalletPage() {
     // Example: const details = await getCompanyPaymentDetails();
     const fetchDepositDetails = async () => {
         setIsLoadingDetails(true);
-        // Simulate network delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
         
         // This mock data would be replaced by your backend response
         const mockDetails: DepositDetails = {

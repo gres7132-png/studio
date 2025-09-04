@@ -60,7 +60,7 @@ export default function DistributorPage() {
         const fetchData = async () => {
             setLoading(true);
             // Example: const data = await getDistributorData(user.uid);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+            
             const mockData: DistributorData = {
                 referredUsersCount: 5,
                 userBalance: 52340,
@@ -98,7 +98,7 @@ export default function DistributorPage() {
         // 2. Mark the user as having applied for the distributor level.
         // e.g., await applyForDistributor(user.uid, selectedTier.level);
         console.log(`Processing application for ${selectedTier.level}...`);
-        await new Promise(resolve => setTimeout(resolve, 1500));
+        
 
         toast({
           title: "Application Successful!",

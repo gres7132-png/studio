@@ -31,7 +31,7 @@ export default function InvestPage() {
       const fetchBalance = async () => {
         setIsLoadingBalance(true);
         // Example: const balance = await getUserBalance(user.uid);
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         setUserBalance(52340); // Mock balance
         setIsLoadingBalance(false);
       };
@@ -56,7 +56,7 @@ export default function InvestPage() {
       // Here you would call your backend function to process the investment.
       // Example: await processInvestment(user.uid, packageName, price);
       console.log(`Processing investment for ${packageName}...`);
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      
 
       // On success, update user balance and show a success message
       setUserBalance(prev => prev - price);

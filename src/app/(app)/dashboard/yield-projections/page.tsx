@@ -43,7 +43,7 @@ export default function YieldProjectionsPage() {
             // In a real application, you would call your backend to calculate projections
             // based on the user's current investments.
             // Example: const data = await getYieldProjections(user.uid);
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            
             const mockData: ChartData[] = [
                 { month: "Jan", earnings: 186 },
                 { month: "Feb", earnings: 305 },

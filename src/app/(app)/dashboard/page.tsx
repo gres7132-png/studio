@@ -41,8 +41,7 @@ export default function DashboardPage() {
         setLoading(true);
         // In a real application, you would fetch this data from your backend.
         // Example: const userStats = await getStatsForUser(user.uid);
-        // For demonstration, we'll use a timeout to simulate a network call.
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        
         const mockStats: UserStats = {
           availableBalance: 52340,
           todaysEarnings: 166,
