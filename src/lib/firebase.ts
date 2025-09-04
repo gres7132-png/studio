@@ -2,14 +2,14 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
-// TODO: Add your own Firebase configuration from the Firebase console
+// Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
-  authDomain: "your-project-id.firebaseapp.com",
-  projectId: "your-project-id",
-  storageBucket: "your-project-id.appspot.com",
-  messagingSenderId: "your-sender-id",
-  appId: "your-app-id",
+  apiKey: "AIzaSyDnFrJWS2t_05w8i3rLen8UXK6nP8eNY1g",
+  authDomain: "fundflow-wzhal.firebaseapp.com",
+  projectId: "fundflow-wzhal",
+  storageBucket: "fundflow-wzhal.appspot.com",
+  messagingSenderId: "231100893920",
+  appId: "1:231100893920:web:c6e5fb9a41984b4f85de85"
 };
 
 // Initialize Firebase
