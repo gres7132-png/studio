@@ -85,7 +85,7 @@ export default function InvestPage() {
                 The onClick would trigger a confirmation modal before processing the transaction.
               */}
               <Button 
-                className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                className="w-full bg-foreground text-background hover:bg-foreground/90"
                 onClick={() => handleInvestment(pkg.name, pkg.price)}
                 disabled={userBalance < pkg.price} // This check makes the button dynamic
               >
