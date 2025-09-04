@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 // --- Admin Configuration ---
 // Add the email addresses of admin users to this array.
 // This is a simple and secure way to manage roles for a small number of admins.
-const ADMIN_EMAILS = ["admin@example.com"]; // Replace with your actual admin email
+const ADMIN_EMAILS = ["gres7132@gmail.com"]; // Replace with your actual admin email
 
 interface AuthContextType {
   user: User | null;
