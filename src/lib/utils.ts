@@ -23,9 +23,11 @@ export function formatCurrency(amount: number, compact = false) {
 
   const kesAmount = amount * 130;
 
+  const formattedKsh = kesFormatter.format(kesAmount).replace(/\s/g, ' ');
+
   if (compact) {
     return `${usdFormatter.format(amount)}`;
   }
   
-  return `${usdFormatter.format(amount)} (${kesFormatter.format(kesAmount)})`;
+  return `${usdFormatter.format(amount)} (${formattedKsh})`;
 }
