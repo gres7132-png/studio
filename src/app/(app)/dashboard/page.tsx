@@ -8,6 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useAuth } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import {
@@ -18,12 +19,21 @@ import {
   Copy,
   ArrowRight,
 } from "lucide-react";
+import { useMemo } from "react";
 
 export default function DashboardPage() {
   const { toast } = useToast();
-  const referralLink = "https://yield.link/ref/user123";
+  const { user } = useAuth();
+  
+  const referralLink = useMemo(() => {
+    if (typeof window !== 'undefined' && user?.uid) {
+      return `${window.location.origin}/auth?ref=${user.uid}`;
+    }
+    return "";
+  }, [user?.uid]);
 
   const handleCopy = () => {
+    if (!referralLink) return;
     navigator.clipboard.writeText(referralLink).then(() => {
       toast({
         title: "Copied to clipboard!",
@@ -46,20 +56,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat) => (
-          <Card key={stat.title}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-              <stat.icon
-                className={`h-5 w-5 ${stat.color} ${stat.bgColor} p-1 rounded-md`}
-              />
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{formatCurrency(stat.value)}</div>
-              <p className="text-xs text-muted-foreground">+2.1% from last month</p>
-            </CardContent>
-          </Card>
-        ))}
         {stats.length === 0 && (
            <>
             <Card>
@@ -124,8 +120,9 @@ export default function DashboardPage() {
                 readOnly
                 value={referralLink}
                 className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background"
+                placeholder="Generating your link..."
               />
-              <Button variant="outline" size="icon" onClick={handleCopy}>
+              <Button variant="outline" size="icon" onClick={handleCopy} disabled={!referralLink}>
                 <Copy className="h-4 w-4" />
               </Button>
             </div>

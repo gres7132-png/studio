@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
@@ -30,7 +30,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Loader2 } from "lucide-react";
 
 const signInSchema = z.object({
@@ -49,6 +49,8 @@ export function AuthForm() {
   const router = useRouter();
   const { toast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
+  const searchParams = useSearchParams();
+  const referralCodeFromUrl = searchParams.get('ref');
 
   const signInForm = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -64,17 +66,24 @@ export function AuthForm() {
       fullName: "",
       email: "",
       password: "",
-      referralCode: "",
+      referralCode: referralCodeFromUrl || "",
     },
   });
+
+  useEffect(() => {
+    if (referralCodeFromUrl) {
+      signUpForm.setValue("referralCode", referralCodeFromUrl);
+    }
+  }, [referralCodeFromUrl, signUpForm]);
+
 
   async function onSignInSubmit(values: z.infer<typeof signInSchema>) {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, values.email, values.password);
       toast({
-        title: "Login Successful",
-        description: "Welcome back!",
+        title: "Welcome back!",
+        description: "You have successfully signed in.",
       });
       router.push("/dashboard");
     } catch (error: any) {
@@ -97,11 +106,27 @@ export function AuthForm() {
         values.email,
         values.password
       );
+
       if (userCredential.user) {
         await updateProfile(userCredential.user, {
           displayName: values.fullName,
         });
+
+        // This is where you would link the new user to their referrer.
+        if (values.referralCode) {
+          console.log(`New user ${userCredential.user.uid} was referred by ${values.referralCode}`);
+          
+          // --- Backend Logic Placeholder ---
+          // In a real application with a database (like Firestore), you would:
+          // 1. Validate that `values.referralCode` is a valid user UID.
+          // 2. Create a document linking the new user to the referrer.
+          //    e.g., `referrals/{new_user_id}` -> { referrerId: 'referrer_uid' }
+          // 3. When the new user adds capital, a backend function would trigger
+          //    to calculate 5% and award it to the referrer.
+          // e.g., await awardReferralBonus(values.referralCode, newUserCapital);
+        }
       }
+      
       toast({
         title: "Welcome!",
         description: "Your account has been created successfully.",
