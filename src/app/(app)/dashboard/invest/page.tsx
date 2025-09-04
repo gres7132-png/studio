@@ -12,42 +12,9 @@ import { CheckCircle } from "lucide-react";
 import AiSuggestions from "@/components/ai-suggestions";
 import { formatCurrency } from "@/lib/utils";
 
-const investmentPackages = [
-  {
-    name: "Starter",
-    price: 1000,
-    roi: "15% Monthly",
-    duration: "3 Months",
-    features: [
-      "Low risk",
-      "Fixed returns",
-      "Ideal for beginners",
-    ],
-    badge: "Popular",
-  },
-  {
-    name: "Pro",
-    price: 5000,
-    roi: "25% Monthly",
-    duration: "6 Months",
-    features: [
-      "Moderate risk",
-      "Higher returns",
-      "Access to premium assets",
-    ],
-  },
-  {
-    name: "Titanium",
-    price: 10000,
-    roi: "40% Monthly",
-    duration: "12 Months",
-    features: [
-      "Calculated risk",
-      "Maximum returns",
-      "Dedicated account manager",
-    ],
-  },
-];
+// Mock data removed as per user request to clean up the codebase.
+// In a real application, this data would be fetched from a database.
+const investmentPackages: any[] = [];
 
 export default function InvestPage() {
   return (
@@ -80,7 +47,7 @@ export default function InvestPage() {
                 <p className="text-muted-foreground">for {pkg.duration}</p>
               </div>
               <ul className="space-y-2 text-sm">
-                {pkg.features.map((feature, i) => (
+                {pkg.features.map((feature: string, i: number) => (
                   <li key={i} className="flex items-center gap-2">
                     <CheckCircle className="h-4 w-4 text-primary" />
                     <span>{feature}</span>
@@ -94,6 +61,16 @@ export default function InvestPage() {
           </Card>
         ))}
       </div>
+
+      {investmentPackages.length === 0 && (
+        <Card>
+          <CardContent className="pt-6">
+            <p className="text-center text-muted-foreground">
+              Investment packages will be available soon. Please check back later.
+            </p>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

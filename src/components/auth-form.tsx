@@ -113,7 +113,8 @@ export function AuthForm() {
         description: "You have successfully signed up.",
       });
       router.push("/dashboard");
-    } catch (error: any) {
+    } catch (error: any)
+{
       console.error("Sign up error:", error);
       toast({
         variant: "destructive",

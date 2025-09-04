@@ -14,20 +14,9 @@ import {
   ChartTooltipContent,
 } from "@/components/ui/chart"
 
-const chartData = [
-  { month: "January", earnings: 186 },
-  { month: "February", earnings: 305 },
-  { month: "March", earnings: 237 },
-  { month: "April", earnings: 273 },
-  { month: "May", earnings: 209 },
-  { month: "June", earnings: 214 },
-  { month: "July", earnings: 250 },
-  { month: "August", earnings: 278 },
-  { month: "September", earnings: 300 },
-  { month: "October", earnings: 320 },
-  { month: "November", earnings: 350 },
-  { month: "December", earnings: 380 },
-]
+// Mock data has been removed. 
+// In a real app, this data would be dynamically generated or fetched based on the user's portfolio.
+const chartData: any[] = [];
 
 const chartConfig = {
   earnings: {
@@ -54,23 +43,31 @@ export default function YieldProjectionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
-            <BarChart accessibilityLayer data={chartData}>
-              <CartesianGrid vertical={false} />
-              <XAxis
-                dataKey="month"
-                tickLine={false}
-                tickMargin={10}
-                axisLine={false}
-              />
-              <YAxis />
-              <ChartTooltip
-                cursor={false}
-                content={<ChartTooltipContent indicator="dot" />}
-              />
-              <Bar dataKey="earnings" fill="var(--color-earnings)" radius={4} />
-            </BarChart>
-          </ChartContainer>
+            {chartData.length > 0 ? (
+                <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
+                    <BarChart accessibilityLayer data={chartData}>
+                    <CartesianGrid vertical={false} />
+                    <XAxis
+                        dataKey="month"
+                        tickLine={false}
+                        tickMargin={10}
+                        axisLine={false}
+                    />
+                    <YAxis />
+                    <ChartTooltip
+                        cursor={false}
+                        content={<ChartTooltipContent indicator="dot" />}
+                    />
+                    <Bar dataKey="earnings" fill="var(--color-earnings)" radius={4} />
+                    </BarChart>
+                </ChartContainer>
+            ) : (
+                <div className="min-h-[300px] flex items-center justify-center">
+                    <p className="text-muted-foreground">
+                        Make an investment to see your yield projections.
+                    </p>
+                </div>
+            )}
         </CardContent>
       </Card>
     </div>

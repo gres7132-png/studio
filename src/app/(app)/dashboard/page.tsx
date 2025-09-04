@@ -32,54 +32,9 @@ export default function DashboardPage() {
     });
   };
 
-  const stats = [
-    {
-      title: "Total Capital",
-      value: 10520.00,
-      icon: DollarSign,
-      color: "text-blue-500",
-      bgColor: "bg-blue-100",
-    },
-    {
-      title: "Daily Income",
-      value: 75.30,
-      icon: TrendingUp,
-      color: "text-green-500",
-      bgColor: "bg-green-100",
-    },
-    {
-      title: "Withdrawable Balance",
-      value: 1234.56,
-      icon: Wallet,
-      color: "text-yellow-500",
-      bgColor: "bg-yellow-100",
-    },
-    {
-      title: "Referral Capital",
-      value: 2500.00,
-      icon: Users,
-      color: "text-purple-500",
-      bgColor: "bg-purple-100",
-    },
-  ];
-
-  const recentActivity = [
-    {
-      type: "Investment",
-      description: "Invested $1,000 in 'Titanium Growth' package.",
-      date: "2 days ago",
-    },
-    {
-      type: "Withdrawal",
-      description: "Withdrew $500.",
-      date: "5 days ago",
-    },
-    {
-      type: "Referral",
-      description: "New referral joined: Alex T.",
-      date: "1 week ago",
-    },
-  ];
+  // Mock data removed. In a real app, you would fetch this from your backend/API.
+  const stats: any[] = [];
+  const recentActivity: any[] = [];
 
   return (
     <div className="flex flex-col gap-8">
@@ -105,6 +60,50 @@ export default function DashboardPage() {
             </CardContent>
           </Card>
         ))}
+        {stats.length === 0 && (
+           <>
+            <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Total Capital</CardTitle>
+                    <DollarSign className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(0)}</div>
+                    <p className="text-xs text-muted-foreground">Make your first investment</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Daily Income</CardTitle>
+                    <TrendingUp className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(0)}</div>
+                    <p className="text-xs text-muted-foreground">Grows with your capital</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Withdrawable Balance</CardTitle>
+                    <Wallet className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(0)}</div>
+                    <p className="text-xs text-muted-foreground">Updated daily</p>
+                </CardContent>
+            </Card>
+             <Card>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                    <CardTitle className="text-sm font-medium">Referral Capital</CardTitle>
+                    <Users className="h-4 w-4 text-muted-foreground" />
+                </CardHeader>
+                <CardContent>
+                    <div className="text-2xl font-bold">{formatCurrency(0)}</div>
+                    <p className="text-xs text-muted-foreground">Invite friends to earn</p>
+                </CardContent>
+            </Card>
+           </>
+        )}
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -139,22 +138,26 @@ export default function DashboardPage() {
             <CardDescription>A log of your recent transactions.</CardDescription>
           </CardHeader>
           <CardContent>
-            <ul className="space-y-4">
-              {recentActivity.map((activity, index) => (
-                <li key={index} className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
-                        <ArrowRight className="h-4 w-4 text-muted-foreground" />
+            {recentActivity.length > 0 ? (
+                <ul className="space-y-4">
+                {recentActivity.map((activity, index) => (
+                    <li key={index} className="flex items-center space-x-4">
+                    <div className="flex-shrink-0">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-muted">
+                            <ArrowRight className="h-4 w-4 text-muted-foreground" />
+                        </div>
                     </div>
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">{activity.type}</p>
-                    <p className="text-sm text-muted-foreground truncate">{activity.description}</p>
-                  </div>
-                   <div className="text-xs text-muted-foreground whitespace-nowrap">{activity.date}</div>
-                </li>
-              ))}
-            </ul>
+                    <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium text-foreground truncate">{activity.type}</p>
+                        <p className="text-sm text-muted-foreground truncate">{activity.description}</p>
+                    </div>
+                    <div className="text-xs text-muted-foreground whitespace-nowrap">{activity.date}</div>
+                    </li>
+                ))}
+                </ul>
+            ) : (
+                <p className="text-sm text-muted-foreground text-center">No recent activity.</p>
+            )}
           </CardContent>
         </Card>
       </div>

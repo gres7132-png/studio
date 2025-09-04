@@ -12,43 +12,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
+  TableCaption,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign, Percent } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
-const referrals = [
-  {
-    name: "Alice Johnson",
-    date: "2023-10-15",
-    capital: 5000,
-    status: "Active",
-  },
-  {
-    name: "Bob Williams",
-    date: "2023-09-22",
-    capital: 1000,
-    status: "Active",
-  },
-  {
-    name: "Charlie Brown",
-    date: "2023-09-01",
-    capital: 10000,
-    status: "Active",
-  },
-  {
-    name: "Diana Miller",
-    date: "2023-08-19",
-    capital: 0,
-    status: "Pending",
-  },
-    {
-    name: "Eve Davis",
-    date: "2023-07-05",
-    capital: 2500,
-    status: "Active",
-  },
-];
+// Mock data has been removed to clean up the codebase.
+// In a real application, you would fetch this data from your backend.
+const referrals: any[] = [];
 
 const totalReferrals = referrals.length;
 const totalReferralCapital = referrals.reduce((acc, ref) => acc + ref.capital, 0);
@@ -72,7 +44,7 @@ export default function ReferralsPage() {
           <CardContent>
             <div className="text-2xl font-bold">{totalReferrals}</div>
             <p className="text-xs text-muted-foreground">
-              +2 this month
+              Invite friends to get started
             </p>
           </CardContent>
         </Card>
@@ -100,9 +72,9 @@ export default function ReferralsPage() {
             <Percent className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(925)}</div>
+            <div className="text-2xl font-bold">{formatCurrency(0)}</div>
             <p className="text-xs text-muted-foreground">
-              Earned this year
+              Earned from referrals
             </p>
           </CardContent>
         </Card>
@@ -117,6 +89,7 @@ export default function ReferralsPage() {
         </CardHeader>
         <CardContent>
           <Table>
+            {referrals.length === 0 && <TableCaption>No referrals yet. Share your link to get started!</TableCaption>}
             <TableHeader>
               <TableRow>
                 <TableHead>Name</TableHead>
