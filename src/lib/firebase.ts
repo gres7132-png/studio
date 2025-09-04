@@ -3,14 +3,18 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 // Your web app's Firebase configuration
-// This object is used to connect to your Firebase project.
+// For more information on how to get this, visit:
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// IMPORTANT: Replace the placeholder values below with the actual
+// configuration object from your Firebase project's settings.
 export const firebaseConfig = {
-  apiKey: "AIzaSyDnFrJWS2t_05w8i3rLen8UXK6nP8eNY1g",
-  authDomain: "fundflow-wzhal.firebaseapp.com",
-  projectId: "fundflow-wzhal",
-  storageBucket: "fundflow-wzhal.firebasestorage.app",
-  messagingSenderId: "231100893920",
-  appId: "1:231100893920:web:c6e5fb9a41984b4f85de85"
+  apiKey: "YOUR_API_KEY", // Replace with your actual API key
+  authDomain: "YOUR_AUTH_DOMAIN", // e.g., your-project-id.firebaseapp.com
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_STORAGE_BUCKET", // e.g., your-project-id.appspot.com
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
 };
 
 // Initialize Firebase for client-side usage
