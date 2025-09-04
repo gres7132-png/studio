@@ -1,3 +1,6 @@
+
+"use client";
+
 import {
   Card,
   CardContent,
@@ -7,62 +10,93 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle } from "lucide-react";
-import AiSuggestions from "@/components/ai-suggestions";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
-// Mock data removed as per user request to clean up the codebase.
-// In a real application, this data would be fetched from a database.
-const investmentPackages: any[] = [];
+// This would come from your database, and userBalance would be fetched for the logged-in user.
+const silverLevelPackages = [
+  { name: "Silver Level 1", price: 1300, dailyReturn: 146, duration: 16, totalReturn: 2336 },
+  { name: "Silver Level 2", price: 2800, dailyReturn: 373, duration: 15, totalReturn: 5695 },
+  { name: "Silver Level 3", price: 3900, dailyReturn: 212, duration: 35, totalReturn: 7420 },
+  { name: "Silver Level 4", price: 9750, dailyReturn: 278, duration: 70, totalReturn: 19460 },
+  { name: "Silver Level 5", price: 20800, dailyReturn: 336, duration: 130, totalReturn: 43680 },
+  { name: "Silver Level 6", price: 39000, dailyReturn: 448, duration: 200, totalReturn: 89600 },
+  { name: "Silver Level 7", price: 65000, dailyReturn: 600, duration: 260, totalReturn: 156000 },
+  { name: "Silver Level 8", price: 117000, dailyReturn: 812, duration: 360, totalReturn: 292500 },
+];
+
+const userBalance = 0; // This should be fetched from your backend.
 
 export default function InvestPage() {
+
+  const handleInvestment = (packageName: string, price: number) => {
+    // This is where you would open a confirmation popup/modal.
+    // The modal would check if `userBalance >= price`.
+    // If true, it would call a backend function to process the investment.
+    // For now, we will just log it.
+    console.log(`Attempting to invest in ${packageName} for ${formatCurrency(price)}`);
+    if (userBalance < price) {
+        console.log("Insufficient balance.");
+        // In a real app, you would show a toast or message to the user.
+    } else {
+        console.log("Proceeding with investment...");
+        // Call backend function here.
+    }
+  };
+
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Investment Packages</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Product Center</h1>
         <p className="text-muted-foreground">
-          Choose a package that suits your financial goals.
+          Invest in a Silver Level package to start earning daily.
         </p>
       </div>
 
-      <AiSuggestions />
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {investmentPackages.map((pkg) => (
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {silverLevelPackages.map((pkg) => (
           <Card
             key={pkg.name}
             className="flex flex-col transform hover:scale-105 transition-transform duration-300"
           >
             <CardHeader>
-              <div className="flex justify-between items-center">
-                <CardTitle>{pkg.name}</CardTitle>
-                {pkg.badge && <Badge variant="destructive">{pkg.badge}</Badge>}
-              </div>
-              <CardDescription>Starts from {formatCurrency(pkg.price)}</CardDescription>
+              <CardTitle>{pkg.name}</CardTitle>
+              <CardDescription>
+                Invest {formatCurrency(pkg.price)}
+              </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow">
-              <div className="mb-4">
-                <p className="text-4xl font-bold">{pkg.roi}</p>
-                <p className="text-muted-foreground">for {pkg.duration}</p>
-              </div>
-              <ul className="space-y-2 text-sm">
-                {pkg.features.map((feature: string, i: number) => (
-                  <li key={i} className="flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-primary" />
-                    <span>{feature}</span>
-                  </li>
-                ))}
-              </ul>
+            <CardContent className="flex-grow space-y-4 text-sm">
+                <div className="flex justify-between items-baseline">
+                    <span className="text-muted-foreground">Daily Return</span>
+                    <span className="font-bold text-lg text-primary">{formatCurrency(pkg.dailyReturn)}</span>
+                </div>
+                 <div className="flex justify-between items-baseline">
+                    <span className="text-muted-foreground">Duration</span>
+                    <span className="font-semibold">{pkg.duration} Days</span>
+                </div>
+                 <div className="flex justify-between items-baseline">
+                    <span className="text-muted-foreground">Total Earnings</span>
+                    <span className="font-bold text-accent">{formatCurrency(pkg.totalReturn)}</span>
+                </div>
             </CardContent>
             <CardFooter>
-              <Button className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Invest Now</Button>
+              {/* 
+                This button is currently disabled. In a real app, you would check `userBalance >= pkg.price`.
+                The onClick would trigger a confirmation modal before processing the transaction.
+              */}
+              <Button 
+                className="w-full bg-accent text-accent-foreground hover:bg-accent/90"
+                onClick={() => handleInvestment(pkg.name, pkg.price)}
+                disabled={userBalance < pkg.price} // This check makes the button dynamic
+              >
+                Invest Now
+              </Button>
             </CardFooter>
           </Card>
         ))}
       </div>
 
-      {investmentPackages.length === 0 && (
+      {silverLevelPackages.length === 0 && (
         <Card>
           <CardContent className="pt-6">
             <p className="text-center text-muted-foreground">
