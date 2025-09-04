@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -32,6 +33,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { Textarea } from "@/components/ui/textarea";
 
 const withdrawableBalance = 1234.56;
 
@@ -59,11 +61,12 @@ const bankingDetailsSchema = z.object({
     path: ["paymentMethod"],
 });
 
+const depositSchema = z.object({
+    transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
+});
 
 export default function WalletPage() {
   const { toast } = useToast();
-  const [paymentMethod, setPaymentMethod] = useState("mobile");
-
 
   const withdrawalForm = useForm<z.infer<typeof withdrawalSchema>>({
     resolver: zodResolver(withdrawalSchema),
@@ -74,6 +77,10 @@ export default function WalletPage() {
     defaultValues: {
       paymentMethod: "mobile",
     },
+  });
+
+  const depositForm = useForm<z.infer<typeof depositSchema>>({
+    resolver: zodResolver(depositSchema),
   });
 
   function onWithdrawalSubmit(values: z.infer<typeof withdrawalSchema>) {
@@ -93,22 +100,69 @@ export default function WalletPage() {
     });
   }
 
+  function onDepositSubmit(values: z.infer<typeof depositSchema>) {
+    console.log("Deposit proof submitted:", values);
+    toast({
+      title: "Proof Submitted",
+      description: "Your deposit is being verified and will reflect in your account shortly.",
+    });
+    depositForm.reset();
+  }
+
   const selectedPaymentMethod = bankingDetailsForm.watch("paymentMethod");
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Wallet</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Withdraw / Deposit</h1>
         <p className="text-muted-foreground">
           Manage your funds and payment details.
         </p>
       </div>
 
-      <Tabs defaultValue="withdraw" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 max-w-md">
+      <Tabs defaultValue="deposit" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 max-w-lg">
+          <TabsTrigger value="deposit">Deposit</TabsTrigger>
           <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
           <TabsTrigger value="banking">Payment Details</TabsTrigger>
         </TabsList>
+        <TabsContent value="deposit">
+          <Card className="max-w-md">
+            <CardHeader>
+                <CardTitle>Make a Deposit</CardTitle>
+                <CardDescription>
+                    To add funds, please make a payment to the details provided by your agent. Then, paste the transaction proof below.
+                </CardDescription>
+            </CardHeader>
+            <CardContent>
+                <Form {...depositForm}>
+                    <form onSubmit={depositForm.handleSubmit(onDepositSubmit)} className="space-y-4">
+                        <FormField
+                            control={depositForm.control}
+                            name="transactionProof"
+                            render={({ field }) => (
+                                <FormItem>
+                                    <FormLabel>Proof of Transaction</FormLabel>
+                                    <FormControl>
+                                        <Textarea
+                                            placeholder="Paste the transaction hash, ID, or confirmation code here."
+                                            className="resize-none"
+                                            {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>
+                                        Your account will be credited once the transaction is verified.
+                                    </FormDescription>
+                                    <FormMessage />
+                                </FormItem>
+                            )}
+                        />
+                        <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Submit Proof</Button>
+                    </form>
+                </Form>
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="withdraw">
           <Card className="max-w-md">
             <CardHeader>

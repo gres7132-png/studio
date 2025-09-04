@@ -1,3 +1,4 @@
+
 "use client";
 
 import Link from "next/link";
@@ -11,6 +12,9 @@ import {
   LogOut,
   Settings,
   LineChart,
+  Briefcase,
+  DollarSign,
+  UserPlus,
 } from "lucide-react";
 
 import { signOut } from "firebase/auth";
@@ -27,6 +31,7 @@ import {
   SidebarTrigger,
   SidebarInset,
   useSidebar,
+  SidebarGroup,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -45,10 +50,10 @@ import { Badge } from "@/components/ui/badge";
 
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
-  { href: "/dashboard/invest", icon: TrendingUp, label: "Invest" },
-  { href: "/dashboard/yield-projections", icon: LineChart, label: "Yield Projections" },
-  { href: "/dashboard/referrals", icon: Users, label: "Referrals" },
-  { href: "/dashboard/wallet", icon: Wallet, label: "Wallet" },
+  { href: "/dashboard/invest", icon: Briefcase, label: "Product Center" },
+  { href: "/dashboard/wallet", icon: Wallet, label: "Withdraw/Deposit" },
+  { href: "/dashboard/referrals", icon: UserPlus, label: "Become a Distributor" },
+  { href: "/dashboard/commissions", icon: DollarSign, label: "Agent Commissions", disabled: true },
 ];
 
 function NavMenu() {
@@ -67,6 +72,7 @@ function NavMenu() {
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
+            disabled={item.disabled}
             isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
             tooltip={item.label}
             onClick={handleLinkClick}
@@ -146,8 +152,35 @@ function UserProfileNav() {
     )
 }
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
+function UserInfo() {
+    const { user, loading } = useAuth();
 
+    if (loading) {
+        return (
+            <div className="p-2 space-y-2">
+                <Skeleton className="h-6 w-2/3" />
+                <Skeleton className="h-4 w-full" />
+            </div>
+        )
+    }
+    
+    // A simple way to generate a somewhat unique ID for display
+    const displayId = user?.uid.substring(0, 5).toUpperCase() ?? 'N/A';
+
+    return (
+        <div className="p-2 text-sm">
+            <div className="font-bold text-sidebar-foreground">
+                ID: {displayId}
+            </div>
+            <div className="text-muted-foreground">
+                {user?.phoneNumber || "No phone number"}
+            </div>
+        </div>
+    )
+}
+
+export default function DashboardLayout({ children }: { children: ReactNode }) {
+  const { user } = useAuth();
   return (
     <SidebarProvider>
       <Sidebar>
@@ -158,6 +191,9 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </SidebarHeader>
         <SidebarContent>
+            <SidebarGroup>
+                {user && <UserInfo />}
+            </SidebarGroup>
           <NavMenu />
         </SidebarContent>
       </Sidebar>
@@ -173,3 +209,4 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </SidebarProvider>
   );
 }
+
