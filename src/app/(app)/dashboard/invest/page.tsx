@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
-import { Badge } from "@/components/ui/badge";
+import { useToast } from "@/hooks/use-toast";
 
 // This would come from your database, and userBalance would be fetched for the logged-in user.
 const silverLevelPackages = [
@@ -28,19 +28,24 @@ const silverLevelPackages = [
 const userBalance = 0; // This should be fetched from your backend.
 
 export default function InvestPage() {
+  const { toast } = useToast();
 
   const handleInvestment = (packageName: string, price: number) => {
-    // This is where you would open a confirmation popup/modal.
-    // The modal would check if `userBalance >= price`.
-    // If true, it would call a backend function to process the investment.
-    // For now, we will just log it.
-    console.log(`Attempting to invest in ${packageName} for ${formatCurrency(price)}`);
     if (userBalance < price) {
-        console.log("Insufficient balance.");
-        // In a real app, you would show a toast or message to the user.
+        toast({
+            variant: "destructive",
+            title: "Insufficient Funds",
+            description: "Please make a deposit to invest in this package.",
+        });
     } else {
+        // This is where you would open a confirmation popup/modal.
+        // The modal would call a backend function to process the investment.
         console.log("Proceeding with investment...");
-        // Call backend function here.
+        // For now, we will just log it and show a success toast.
+        toast({
+            title: "Investment Successful!",
+            description: `You have invested in ${packageName}.`,
+        });
     }
   };
 
@@ -80,14 +85,9 @@ export default function InvestPage() {
                 </div>
             </CardContent>
             <CardFooter>
-              {/* 
-                This button is currently disabled. In a real app, you would check `userBalance >= pkg.price`.
-                The onClick would trigger a confirmation modal before processing the transaction.
-              */}
               <Button 
                 className="w-full bg-foreground text-background hover:bg-foreground/90"
                 onClick={() => handleInvestment(pkg.name, pkg.price)}
-                disabled={userBalance < pkg.price} // This check makes the button dynamic
               >
                 Invest Now
               </Button>
