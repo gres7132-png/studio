@@ -24,6 +24,14 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useState } from "react";
 
 const withdrawalSchema = z.object({
   amount: z.coerce
@@ -33,14 +41,26 @@ const withdrawalSchema = z.object({
 });
 
 const bankingDetailsSchema = z.object({
-  bankName: z.string().min(1, "Bank name is required."),
-  accountHolder: z.string().min(1, "Account holder name is required."),
-  accountNumber: z.string().min(1, "Account number is required."),
-  routingNumber: z.string().min(1, "Routing number is required."),
+  paymentMethod: z.enum(["mobile", "crypto", "whatsapp"]),
+  mobileNumber: z.string().optional(),
+  cryptoCurrency: z.enum(["BTC", "ETH", "USDT"]).optional(),
+  cryptoAddress: z.string().optional(),
+  whatsappNumber: z.string().optional(),
+}).refine(data => {
+    if (data.paymentMethod === "mobile") return !!data.mobileNumber;
+    if (data.paymentMethod === "crypto") return !!data.cryptoCurrency && !!data.cryptoAddress;
+    if (data.paymentMethod === "whatsapp") return !!data.whatsappNumber;
+    return true;
+}, {
+    message: "Please fill in the required details for the selected payment method.",
+    path: ["paymentMethod"],
 });
+
 
 export default function WalletPage() {
   const { toast } = useToast();
+  const [paymentMethod, setPaymentMethod] = useState("mobile");
+
 
   const withdrawalForm = useForm<z.infer<typeof withdrawalSchema>>({
     resolver: zodResolver(withdrawalSchema),
@@ -49,10 +69,7 @@ export default function WalletPage() {
   const bankingDetailsForm = useForm<z.infer<typeof bankingDetailsSchema>>({
     resolver: zodResolver(bankingDetailsSchema),
     defaultValues: {
-      bankName: "Global Trust Bank",
-      accountHolder: "John Doe",
-      accountNumber: "••••••••1234",
-      routingNumber: "•••••4321",
+      paymentMethod: "mobile",
     },
   });
 
@@ -69,30 +86,32 @@ export default function WalletPage() {
     console.log("Banking details update:", values);
     toast({
       title: "Banking Details Updated",
-      description: "Your banking information has been saved securely.",
+      description: "Your payment information has been saved securely.",
     });
   }
+
+  const selectedPaymentMethod = bankingDetailsForm.watch("paymentMethod");
 
   return (
     <div className="space-y-8">
       <div>
         <h1 className="text-3xl font-bold tracking-tight">Wallet</h1>
         <p className="text-muted-foreground">
-          Manage your funds and banking details.
+          Manage your funds and payment details.
         </p>
       </div>
 
       <Tabs defaultValue="withdraw" className="w-full">
         <TabsList className="grid w-full grid-cols-2 max-w-md">
           <TabsTrigger value="withdraw">Withdraw</TabsTrigger>
-          <TabsTrigger value="banking">Banking Details</TabsTrigger>
+          <TabsTrigger value="banking">Payment Details</TabsTrigger>
         </TabsList>
         <TabsContent value="withdraw">
           <Card className="max-w-md">
             <CardHeader>
               <CardTitle>Request Withdrawal</CardTitle>
               <CardDescription>
-                Transfer your proceeds to your bank account. Processing may take 3-5 business days.
+                Transfer your proceeds to your account. Processing may take 3-5 business days.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -129,7 +148,7 @@ export default function WalletPage() {
         <TabsContent value="banking">
           <Card className="max-w-md">
             <CardHeader>
-              <CardTitle>Banking Details</CardTitle>
+              <CardTitle>Payment Details</CardTitle>
               <CardDescription>
                 This information is used for processing your withdrawals.
               </CardDescription>
@@ -142,56 +161,102 @@ export default function WalletPage() {
                 >
                   <FormField
                     control={bankingDetailsForm.control}
-                    name="bankName"
+                    name="paymentMethod"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Bank Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Your Bank Inc." {...field} />
-                        </FormControl>
+                        <FormLabel>Payment Method</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger>
+                              <SelectValue placeholder="Select a payment method" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="mobile">Mobile Money (Airtel/Safaricom)</SelectItem>
+                            <SelectItem value="crypto">Crypto Wallet</SelectItem>
+                            <SelectItem value="whatsapp">WhatsApp Pay (International)</SelectItem>
+                          </SelectContent>
+                        </Select>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
-                  <FormField
-                    control={bankingDetailsForm.control}
-                    name="accountHolder"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Holder Name</FormLabel>
-                        <FormControl>
-                          <Input placeholder="John Doe" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={bankingDetailsForm.control}
-                    name="accountNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Account Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="1234567890" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={bankingDetailsForm.control}
-                    name="routingNumber"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Routing Number</FormLabel>
-                        <FormControl>
-                          <Input placeholder="0987654321" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
+                  
+                  {selectedPaymentMethod === "mobile" && (
+                    <FormField
+                      control={bankingDetailsForm.control}
+                      name="mobileNumber"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Phone Number</FormLabel>
+                          <FormControl>
+                            <Input placeholder="e.g. 0712345678" {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
+
+                  {selectedPaymentMethod === "crypto" && (
+                    <div className="space-y-4">
+                      <FormField
+                        control={bankingDetailsForm.control}
+                        name="cryptoCurrency"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Cryptocurrency</FormLabel>
+                             <Select onValueChange={field.onChange} defaultValue={field.value}>
+                              <FormControl>
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select a currency" />
+                                </SelectTrigger>
+                              </FormControl>
+                              <SelectContent>
+                                <SelectItem value="BTC">Bitcoin (BTC)</SelectItem>
+                                <SelectItem value="ETH">Ethereum (ETH)</SelectItem>
+                                <SelectItem value="USDT">Tether (USDT)</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                       <FormField
+                        control={bankingDetailsForm.control}
+                        name="cryptoAddress"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>Wallet Address</FormLabel>
+                            <FormControl>
+                              <Input placeholder="Enter your wallet address" {...field} />
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </div>
+                  )}
+
+                  {selectedPaymentMethod === "whatsapp" && (
+                     <FormField
+                        control={bankingDetailsForm.control}
+                        name="whatsappNumber"
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormLabel>WhatsApp Number</FormLabel>
+                            <FormControl>
+                              <Input placeholder="e.g. +1234567890" {...field} />
+                            </FormControl>
+                             <FormDescription>
+                                Include your country code.
+                            </FormDescription>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                  )}
+                  
                   <Button type="submit" className="w-full">Save Details</Button>
                 </form>
               </Form>
