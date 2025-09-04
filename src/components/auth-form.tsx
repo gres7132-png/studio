@@ -4,6 +4,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { useRouter } from "next/navigation";
+import {
+  createUserWithEmailAndPassword,
+  signInWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { auth } from "@/lib/firebase";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -24,6 +30,8 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
@@ -40,6 +48,7 @@ const signUpSchema = z.object({
 export function AuthForm() {
   const router = useRouter();
   const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(false);
 
   const signInForm = useForm<z.infer<typeof signInSchema>>({
     resolver: zodResolver(signInSchema),
@@ -59,22 +68,53 @@ export function AuthForm() {
     },
   });
 
-  function onSignInSubmit(values: z.infer<typeof signInSchema>) {
-    console.log("Sign in with:", values);
-    toast({
+  async function onSignInSubmit(values: z.infer<typeof signInSchema>) {
+    setIsLoading(true);
+    try {
+      await signInWithEmailAndPassword(auth, values.email, values.password);
+      toast({
         title: "Login Successful",
         description: "Welcome back!",
-    });
-    router.push("/dashboard");
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Sign in error:", error);
+      toast({
+        variant: "destructive",
+        title: "Login Failed",
+        description: error.message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
-  function onSignUpSubmit(values: z.infer<typeof signUpSchema>) {
-    console.log("Sign up with:", values);
-    toast({
+  async function onSignUpSubmit(values: z.infer<typeof signUpSchema>) {
+    setIsLoading(true);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        values.email,
+        values.password
+      );
+      await updateProfile(userCredential.user, {
+        displayName: values.fullName,
+      });
+      toast({
         title: "Account Created",
         description: "You have successfully signed up.",
-    });
-    router.push("/dashboard");
+      });
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Sign up error:", error);
+      toast({
+        variant: "destructive",
+        title: "Sign Up Failed",
+        description: error.message || "An unexpected error occurred.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   }
 
   return (
@@ -104,7 +144,7 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder="name@example.com" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -117,13 +157,16 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Sign In</Button>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+                  {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Sign In
+                </Button>
               </form>
             </Form>
           </CardContent>
@@ -150,7 +193,7 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Full Name</FormLabel>
                       <FormControl>
-                        <Input placeholder="John Doe" {...field} />
+                        <Input placeholder="John Doe" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -163,7 +206,7 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input placeholder="name@example.com" {...field} />
+                        <Input placeholder="name@example.com" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -176,7 +219,7 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Password</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="••••••••" {...field} />
+                        <Input type="password" placeholder="••••••••" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -189,13 +232,16 @@ export function AuthForm() {
                     <FormItem>
                       <FormLabel>Referral Code (Optional)</FormLabel>
                       <FormControl>
-                        <Input placeholder="Enter referral code" {...field} />
+                        <Input placeholder="Enter referral code" {...field} disabled={isLoading} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90">Create Account</Button>
+                <Button type="submit" className="w-full bg-accent text-accent-foreground hover:bg-accent/90" disabled={isLoading}>
+                   {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  Create Account
+                </Button>
               </form>
             </Form>
           </CardContent>
