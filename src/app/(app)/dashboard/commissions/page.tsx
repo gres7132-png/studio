@@ -23,7 +23,7 @@ import { Users } from "lucide-react";
 
 // The figures are in KES.
 const commissionTiers = [
-  { referrals: 20, commission: 65000 },
+  { referrals: 20, commission: 6500 },
   { referrals: 75, commission: 20000 },
   { referrals: 200, commission: 35000 },
   { referrals: 500, commission: 55000 },
