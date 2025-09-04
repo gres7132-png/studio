@@ -1,19 +1,26 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { onAuthStateChanged, User } from "firebase/auth";
-import { auth, app } from "@/lib/firebase"; // Import app to ensure it's initialized
+import { onAuthStateChanged, User, getAuth, Auth } from "firebase/auth";
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { firebaseConfig } from "@/lib/firebase";
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
+  auth: Auth;
 }
+
+// Initialize Firebase on the client side
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
+  auth: auth,
 });
 
 // Loading component to show while we check for authentication state
@@ -73,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // If we are done loading and the user is authenticated, OR if we are on the public auth page,
   // render the children components.
   if ((!loading && user) || isAuthPage) {
-      return <>{children}</>;
+      return <AuthContext.Provider value={{ user, loading, auth }}>{children}</AuthContext.Provider>;
   }
 
   // This will be the case for an unauthenticated user trying to access a protected page

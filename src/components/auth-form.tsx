@@ -8,8 +8,10 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
+  getAuth,
 } from "firebase/auth";
-import { auth } from "@/lib/firebase";
+import { getApp, getApps, initializeApp } from "firebase/app";
+import { firebaseConfig } from "@/lib/firebase";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +34,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
+
+// Initialize Firebase on the client side
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+const auth = getAuth(app);
 
 const signInSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),

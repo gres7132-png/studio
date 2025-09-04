@@ -12,7 +12,7 @@ import {
   Settings,
   LineChart,
 } from "lucide-react";
-import { auth } from "@/lib/firebase";
+
 import { signOut } from "firebase/auth";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -82,7 +82,7 @@ function NavMenu() {
 }
 
 function UserProfileNav() {
-    const { user, loading } = useAuth();
+    const { user, loading, auth } = useAuth();
     const router = useRouter();
 
     const handleLogout = async () => {
