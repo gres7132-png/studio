@@ -24,6 +24,7 @@ import {
   SidebarFooter,
   SidebarTrigger,
   SidebarInset,
+  useSidebar,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -46,6 +47,47 @@ const navItems = [
   { href: "/dashboard/wallet", icon: Wallet, label: "Wallet" },
 ];
 
+function NavMenu() {
+  const pathname = usePathname();
+  const { setOpenMobile, isMobile } = useSidebar();
+
+  const handleLinkClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
+  return (
+    <>
+      <SidebarMenu>
+        {navItems.map((item) => (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
+              tooltip={item.label}
+              onClick={handleLinkClick}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </SidebarMenu>
+      <SidebarMenu>
+        <SidebarMenuButton asChild isActive={pathname === "/dashboard/profile"} tooltip="Profile" onClick={handleLinkClick}>
+          <Link href="/dashboard/profile">
+            <User />
+            <span>Profile</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenu>
+    </>
+  )
+}
+
 export default function DashboardLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
@@ -59,31 +101,8 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarMenu>
-            {navItems.map((item) => (
-              <SidebarMenuItem key={item.href}>
-                <SidebarMenuButton
-                  asChild
-                  isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
-                  tooltip={item.label}
-                >
-                  <Link href={item.href}>
-                    <item.icon />
-                    <span>{item.label}</span>
-                  </Link>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
-            ))}
-          </SidebarMenu>
+          <NavMenu />
         </SidebarContent>
-        <SidebarFooter>
-          <SidebarMenuButton asChild isActive={pathname === "/dashboard/profile"} tooltip="Profile">
-            <Link href="/dashboard/profile">
-              <User />
-              <span>Profile</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarFooter>
       </Sidebar>
       <SidebarInset>
         <header className="flex h-14 items-center justify-between lg:justify-end border-b px-4 lg:px-6">
