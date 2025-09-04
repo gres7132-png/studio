@@ -33,11 +33,14 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 
+const withdrawableBalance = 1234.56;
+
 const withdrawalSchema = z.object({
   amount: z.coerce
     .number()
     .positive({ message: "Amount must be positive." })
-    .min(10, { message: "Minimum withdrawal is $10." }),
+    .min(10, { message: "Minimum withdrawal is $10." })
+    .max(withdrawableBalance, { message: "Amount exceeds withdrawable balance." }),
 });
 
 const bankingDetailsSchema = z.object({
@@ -133,7 +136,7 @@ export default function WalletPage() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Withdrawable balance: {formatCurrency(1234.56)}
+                          Withdrawable balance: {formatCurrency(withdrawableBalance)}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -173,8 +176,8 @@ export default function WalletPage() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="mobile">Mobile Money (Airtel/Safaricom)</SelectItem>
-                            <SelectItem value="crypto">Crypto Wallet</SelectItem>
-                            <SelectItem value="whatsapp">WhatsApp Pay (International)</SelectItem>
+                            <SelectItem value="crypto">Crypto Wallet (USDT, ETH, BTC)</SelectItem>
+                            <SelectItem value="whatsapp">WhatsApp (MiniPay for international)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
