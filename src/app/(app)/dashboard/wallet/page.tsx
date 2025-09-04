@@ -190,7 +190,7 @@ export default function WalletPage() {
             <CardHeader>
               <CardTitle>Request Withdrawal</CardTitle>
               <CardDescription>
-                Transfer your proceeds to your account. Processing may take 3-5 business days.
+                A 15% service fee will be deducted from every withdrawal. Processing may take 3-5 business days.
               </CardDescription>
             </CardHeader>
             <CardContent>
