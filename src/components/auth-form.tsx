@@ -97,9 +97,11 @@ export function AuthForm() {
         values.email,
         values.password
       );
-      await updateProfile(userCredential.user, {
-        displayName: values.fullName,
-      });
+      if (userCredential.user) {
+        await updateProfile(userCredential.user, {
+          displayName: values.fullName,
+        });
+      }
       toast({
         title: "Account Created",
         description: "You have successfully signed up.",
