@@ -22,12 +22,12 @@ import {
 export default function DashboardPage() {
   const { user } = useAuth();
   
-  // Mock data, in a real app, you would fetch this from your backend/API.
+  // This data would be fetched from your Firestore database in a real application.
   const stats = {
     availableBalance: 0,
     todaysEarnings: 0,
-    rechargeAmount: 1300,
-    withdrawalAmount: 2336,
+    rechargeAmount: 0,
+    withdrawalAmount: 0,
   };
 
   return (
