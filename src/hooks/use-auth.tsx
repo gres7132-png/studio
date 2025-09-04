@@ -26,7 +26,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setUser(user);
       setLoading(false);
 
-      if (!user && !pathname.startsWith('/auth')) {
+      if (user && pathname.startsWith('/auth')) {
+        router.push('/dashboard');
+      } else if (!user && !pathname.startsWith('/auth')) {
         router.push("/auth");
       }
     });
