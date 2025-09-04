@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
+import { formatCurrency } from "@/lib/utils";
 
 const withdrawalSchema = z.object({
   amount: z.coerce
@@ -59,7 +60,7 @@ export default function WalletPage() {
     console.log("Withdrawal request:", values);
     toast({
       title: "Withdrawal Requested",
-      description: `Your request to withdraw $${values.amount.toFixed(2)} is being processed.`,
+      description: `Your request to withdraw ${formatCurrency(values.amount)} is being processed.`,
     });
     withdrawalForm.reset();
   }
@@ -113,7 +114,7 @@ export default function WalletPage() {
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Withdrawable balance: $1,234.56
+                          Withdrawable balance: {formatCurrency(1234.56)}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>

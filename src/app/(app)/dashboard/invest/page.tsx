@@ -10,11 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { CheckCircle } from "lucide-react";
 import AiSuggestions from "@/components/ai-suggestions";
+import { formatCurrency } from "@/lib/utils";
 
 const investmentPackages = [
   {
     name: "Starter",
-    price: "1,000",
+    price: 1000,
     roi: "15% Monthly",
     duration: "3 Months",
     features: [
@@ -26,7 +27,7 @@ const investmentPackages = [
   },
   {
     name: "Pro",
-    price: "5,000",
+    price: 5000,
     roi: "25% Monthly",
     duration: "6 Months",
     features: [
@@ -37,7 +38,7 @@ const investmentPackages = [
   },
   {
     name: "Titanium",
-    price: "10,000",
+    price: 10000,
     roi: "40% Monthly",
     duration: "12 Months",
     features: [
@@ -71,7 +72,7 @@ export default function InvestPage() {
                 <CardTitle>{pkg.name}</CardTitle>
                 {pkg.badge && <Badge variant="destructive">{pkg.badge}</Badge>}
               </div>
-              <CardDescription>Starts from ${pkg.price}</CardDescription>
+              <CardDescription>Starts from {formatCurrency(pkg.price)}</CardDescription>
             </CardHeader>
             <CardContent className="flex-grow">
               <div className="mb-4">

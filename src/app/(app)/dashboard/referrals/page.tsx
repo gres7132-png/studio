@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Users, DollarSign, Percent } from "lucide-react";
+import { formatCurrency } from "@/lib/utils";
 
 const referrals = [
   {
@@ -84,7 +85,7 @@ export default function ReferralsPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">
-              ${totalReferralCapital.toLocaleString()}
+              {formatCurrency(totalReferralCapital)}
             </div>
             <p className="text-xs text-muted-foreground">
               Invested by your network
@@ -99,7 +100,7 @@ export default function ReferralsPage() {
             <Percent className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">$925.00</div>
+            <div className="text-2xl font-bold">{formatCurrency(925)}</div>
             <p className="text-xs text-muted-foreground">
               Earned this year
             </p>
@@ -135,7 +136,7 @@ export default function ReferralsPage() {
                     </Badge>
                   </TableCell>
                   <TableCell className="text-right">
-                    ${referral.capital.toLocaleString()}
+                    {formatCurrency(referral.capital, true)}
                   </TableCell>
                 </TableRow>
               ))}

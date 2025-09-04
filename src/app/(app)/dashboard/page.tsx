@@ -9,6 +9,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { formatCurrency } from "@/lib/utils";
 import {
   DollarSign,
   TrendingUp,
@@ -34,28 +35,28 @@ export default function DashboardPage() {
   const stats = [
     {
       title: "Total Capital",
-      value: "$10,520.00",
+      value: 10520.00,
       icon: DollarSign,
       color: "text-blue-500",
       bgColor: "bg-blue-100",
     },
     {
       title: "Daily Income",
-      value: "$75.30",
+      value: 75.30,
       icon: TrendingUp,
       color: "text-green-500",
       bgColor: "bg-green-100",
     },
     {
       title: "Withdrawable Balance",
-      value: "$1,234.56",
+      value: 1234.56,
       icon: Wallet,
       color: "text-yellow-500",
       bgColor: "bg-yellow-100",
     },
     {
       title: "Referral Capital",
-      value: "$2,500.00",
+      value: 2500.00,
       icon: Users,
       color: "text-purple-500",
       bgColor: "bg-purple-100",
@@ -99,7 +100,7 @@ export default function DashboardPage() {
               />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
+              <div className="text-2xl font-bold">{formatCurrency(stat.value)}</div>
               <p className="text-xs text-muted-foreground">+2.1% from last month</p>
             </CardContent>
           </Card>
