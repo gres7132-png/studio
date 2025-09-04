@@ -55,7 +55,7 @@ const navItems = [
   { href: "/dashboard/wallet", icon: Wallet, label: "Withdraw/Deposit" },
   { href: "/dashboard/referrals", icon: UserPlus, label: "Referral Program" },
   { href: "/dashboard/distributor", icon: Gift, label: "Distributor Program" },
-  { href: "/dashboard/commissions", icon: DollarSign, label: "Agent Commissions", disabled: true },
+  { href: "/dashboard/commissions", icon: DollarSign, label: "Agent Commissions" },
 ];
 
 function NavMenu() {
