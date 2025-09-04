@@ -8,14 +8,7 @@ import { getAuth } from "firebase/auth";
 
 // IMPORTANT: Replace the placeholder values below with the actual
 // configuration object from your Firebase project's settings.
-export const firebaseConfig = {
-  apiKey: "YOUR_API_KEY", // Replace with your actual API key
-  authDomain: "YOUR_AUTH_DOMAIN", // e.g., your-project-id.firebaseapp.com
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET", // e.g., your-project-id.appspot.com
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID"
-};
+export const firebaseConfig = {"apiKey":"YOUR_API_KEY","authDomain":"YOUR_AUTH_DOMAIN","projectId":"YOUR_PROJECT_ID","storageBucket":"YOUR_STORAGE_BUCKET","messagingSenderId":"YOUR_MESSAGING_SENDER_ID","appId":"YOUR_APP_ID"};
 
 // Initialize Firebase for client-side usage
 // This pattern prevents re-initializing the app on every hot-reload
