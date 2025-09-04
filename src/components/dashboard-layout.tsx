@@ -33,6 +33,7 @@ import {
   SidebarInset,
   useSidebar,
   SidebarGroup,
+  SidebarFooter,
 } from "@/components/ui/sidebar";
 import {
   DropdownMenu,
@@ -61,6 +62,8 @@ const navItems = [
 function NavMenu() {
   const pathname = usePathname();
   const { setOpenMobile, isMobile } = useSidebar();
+  const router = useRouter();
+  const { auth } = useAuth();
 
   const handleLinkClick = () => {
     if (isMobile) {
@@ -68,25 +71,42 @@ function NavMenu() {
     }
   };
 
+  const handleLogout = async () => {
+    await signOut(auth);
+    router.push("/auth");
+  };
+
   return (
-    <SidebarMenu>
-      {navItems.map((item) => (
-        <SidebarMenuItem key={item.href}>
-          <SidebarMenuButton
-            asChild
-            disabled={item.disabled}
-            isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
-            tooltip={item.label}
-            onClick={handleLinkClick}
-          >
-            <Link href={item.href}>
-              <item.icon />
-              <span>{item.label}</span>
-            </Link>
-          </SidebarMenuButton>
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
+    <>
+      <SidebarMenu>
+        {navItems.map((item) => (
+          <SidebarMenuItem key={item.href}>
+            <SidebarMenuButton
+              asChild
+              isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
+              tooltip={item.label}
+              onClick={handleLinkClick}
+            >
+              <Link href={item.href}>
+                <item.icon />
+                <span>{item.label}</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        ))}
+      </SidebarMenu>
+
+      <SidebarFooter className="mt-auto">
+        <SidebarMenu>
+          <SidebarMenuItem>
+             <SidebarMenuButton onClick={handleLogout} tooltip="Log Out">
+                <LogOut />
+                <span>Log Out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+    </>
   )
 }
 
