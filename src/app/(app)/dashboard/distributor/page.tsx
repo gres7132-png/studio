@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Card,
   CardContent,
@@ -34,24 +34,48 @@ import {
 import { Users, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { distributorTiers } from "@/lib/config";
-
-// In a real application, these values would be fetched from your backend.
-const referredUsersCount = 0; 
-const userBalance = 0; 
+import { useAuth } from "@/hooks/use-auth";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type Tier = typeof distributorTiers[0];
 
+interface DistributorData {
+    referredUsersCount: number;
+    userBalance: number;
+    totalDividends: number;
+    pendingDividends: number;
+}
+
 export default function DistributorPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [isApplying, setIsApplying] = useState(false);
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
-  
-  // These values should be fetched from your backend.
-  const totalDividends = 0;
-  const pendingDividends = 0;
+  const [distributorData, setDistributorData] = useState<DistributorData | null>(null);
+  const [loading, setLoading] = useState(true);
 
+  useEffect(() => {
+    if (user) {
+        // --- Backend Data Fetching Placeholder ---
+        const fetchData = async () => {
+            setLoading(true);
+            // Example: const data = await getDistributorData(user.uid);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            const mockData: DistributorData = {
+                referredUsersCount: 5,
+                userBalance: 52340,
+                totalDividends: 15000,
+                pendingDividends: 2500,
+            };
+            setDistributorData(mockData);
+            setLoading(false);
+        };
+        fetchData();
+    }
+  }, [user]);
+  
   const handleApplyClick = (tier: Tier) => {
-    if (userBalance < tier.deposit) {
+    if (!distributorData || distributorData.userBalance < tier.deposit) {
       toast({
         variant: "destructive",
         title: "Insufficient Funds",
@@ -63,33 +87,44 @@ export default function DistributorPage() {
   };
 
   const handleConfirmApply = async () => {
-    if (!selectedTier) return;
+    if (!selectedTier || !user) return;
 
     setIsApplying(true);
     
-    // --- Backend Logic Placeholder ---
-    // Here you would call a backend function to:
-    // 1. Deduct the deposit from the user's balance.
-    // 2. Mark the user as having applied for the distributor level.
-    // 3. Handle any potential errors from the backend.
-    // e.g., await applyForDistributor(selectedTier.level);
-    console.log(`Processing application for ${selectedTier.level}...`);
-    
-    // Simulate network delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
+    try {
+        // --- Backend Logic Placeholder ---
+        // Here you would call a backend function to:
+        // 1. Deduct the deposit from the user's balance.
+        // 2. Mark the user as having applied for the distributor level.
+        // e.g., await applyForDistributor(user.uid, selectedTier.level);
+        console.log(`Processing application for ${selectedTier.level}...`);
+        await new Promise(resolve => setTimeout(resolve, 1500));
 
-    setIsApplying(false);
-    setSelectedTier(null);
+        toast({
+          title: "Application Successful!",
+          description: `You have applied for the ${selectedTier.level} distributor level. Your application is now pending approval.`,
+        });
 
-    toast({
-      title: "Application Successful!",
-      description: `You have applied for the ${selectedTier.level} distributor level. Your application is now pending approval.`,
-    });
+        // Optimistically update the UI or refetch data
+        setDistributorData(prev => prev ? {...prev, userBalance: prev.userBalance - selectedTier.deposit} : null);
+
+    } catch (error) {
+        toast({
+            variant: "destructive",
+            title: "Application Failed",
+            description: "Could not process your application. Please try again.",
+        });
+    } finally {
+        setIsApplying(false);
+        setSelectedTier(null);
+    }
   };
 
   const handleCancelApply = () => {
     setSelectedTier(null);
   };
+
+  const prerequisiteMet = (distributorData?.referredUsersCount ?? 0) >= 2;
 
   return (
     <>
@@ -101,7 +136,7 @@ export default function DistributorPage() {
           </p>
         </div>
 
-        {referredUsersCount < 2 && (
+        {!loading && !prerequisiteMet && (
           <Alert>
               <Users className="h-4 w-4" />
               <AlertTitle>Prerequisite Not Met</AlertTitle>
@@ -117,7 +152,7 @@ export default function DistributorPage() {
               <CardTitle>TOTAL DIVIDENDS</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">{formatCurrency(totalDividends)}</p>
+              {loading ? <Skeleton className="h-10 w-1/2" /> : <p className="text-4xl font-bold">{formatCurrency(distributorData?.totalDividends ?? 0)}</p>}
             </CardContent>
           </Card>
           <Card>
@@ -125,7 +160,7 @@ export default function DistributorPage() {
               <CardTitle>PENDING DIVIDENDS</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-4xl font-bold">{formatCurrency(pendingDividends)}</p>
+             {loading ? <Skeleton className="h-10 w-1/2" /> : <p className="text-4xl font-bold">{formatCurrency(distributorData?.pendingDividends ?? 0)}</p>}
             </CardContent>
           </Card>
         </div>
@@ -161,7 +196,7 @@ export default function DistributorPage() {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        disabled={referredUsersCount < 2}
+                        disabled={loading || !prerequisiteMet}
                         onClick={() => handleApplyClick(tier)}
                       >
                         Apply

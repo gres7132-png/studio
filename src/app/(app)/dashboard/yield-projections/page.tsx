@@ -1,5 +1,7 @@
+
 "use client"
 
+import { useEffect, useState } from "react"
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from "recharts"
 import {
   Card,
@@ -13,10 +15,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
+import { useAuth } from "@/hooks/use-auth"
+import { Skeleton } from "@/components/ui/skeleton"
 
-// Mock data has been removed. 
-// In a real app, this data would be dynamically generated or fetched based on the user's portfolio.
-const chartData: any[] = [];
+interface ChartData {
+  month: string;
+  earnings: number;
+}
 
 const chartConfig = {
   earnings: {
@@ -26,6 +31,35 @@ const chartConfig = {
 }
 
 export default function YieldProjectionsPage() {
+  const { user } = useAuth();
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+        // --- Backend Data Fetching Placeholder ---
+        const fetchProjections = async () => {
+            setLoading(true);
+            // In a real application, you would call your backend to calculate projections
+            // based on the user's current investments.
+            // Example: const data = await getYieldProjections(user.uid);
+            await new Promise(resolve => setTimeout(resolve, 1500));
+            const mockData: ChartData[] = [
+                { month: "Jan", earnings: 186 },
+                { month: "Feb", earnings: 305 },
+                { month: "Mar", earnings: 237 },
+                { month: "Apr", earnings: 473 },
+                { month: "May", earnings: 300 },
+                { month: "Jun", earnings: 550 },
+            ];
+            setChartData(mockData);
+            setLoading(false);
+        };
+        fetchProjections();
+    }
+  }, [user]);
+
+
   return (
     <div className="space-y-8">
       <div>
@@ -43,7 +77,11 @@ export default function YieldProjectionsPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-            {chartData.length > 0 ? (
+            {loading ? (
+                 <div className="min-h-[300px] flex items-center justify-center">
+                    <Skeleton className="h-[250px] w-full" />
+                 </div>
+            ) : chartData.length > 0 ? (
                 <ChartContainer config={chartConfig} className="min-h-[300px] w-full">
                     <BarChart accessibilityLayer data={chartData}>
                     <CartesianGrid vertical={false} />
@@ -53,7 +91,9 @@ export default function YieldProjectionsPage() {
                         tickMargin={10}
                         axisLine={false}
                     />
-                    <YAxis />
+                    <YAxis
+                      tickFormatter={(value) => `$${value}`}
+                    />
                     <ChartTooltip
                         cursor={false}
                         content={<ChartTooltipContent indicator="dot" />}

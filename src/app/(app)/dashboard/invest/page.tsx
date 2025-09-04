@@ -13,29 +13,66 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { useToast } from "@/hooks/use-toast";
 import { silverLevelPackages } from "@/lib/config";
+import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
+import { Loader2 } from "lucide-react";
 
-const userBalance = 0; // This should be fetched from your backend.
 
 export default function InvestPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [userBalance, setUserBalance] = useState(0);
+  const [isLoadingBalance, setIsLoadingBalance] = useState(true);
+  const [isInvesting, setIsInvesting] = useState<string | null>(null);
 
-  const handleInvestment = (packageName: string, price: number) => {
-    // In a real app, userBalance would be fetched from a backend service
+  useEffect(() => {
+    if (user) {
+      // --- Backend Data Fetching Placeholder ---
+      const fetchBalance = async () => {
+        setIsLoadingBalance(true);
+        // Example: const balance = await getUserBalance(user.uid);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        setUserBalance(52340); // Mock balance
+        setIsLoadingBalance(false);
+      };
+      fetchBalance();
+    }
+  }, [user]);
+
+  const handleInvestment = async (packageName: string, price: number) => {
     if (userBalance < price) {
         toast({
             variant: "destructive",
             title: "Insufficient Funds",
             description: "Please make a deposit to invest in this package.",
         });
-    } else {
-        // This is where you would open a confirmation popup/modal.
-        // The modal would call a backend function to process the investment.
-        console.log("Proceeding with investment...");
-        // For now, we will just log it and show a success toast.
-        toast({
-            title: "Investment Successful!",
-            description: `You have invested in ${packageName}.`,
+        return;
+    }
+
+    setIsInvesting(packageName);
+
+    try {
+      // --- Backend Logic Placeholder ---
+      // Here you would call your backend function to process the investment.
+      // Example: await processInvestment(user.uid, packageName, price);
+      console.log(`Processing investment for ${packageName}...`);
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // On success, update user balance and show a success message
+      setUserBalance(prev => prev - price);
+      toast({
+          title: "Investment Successful!",
+          description: `You have invested in ${packageName}.`,
+      });
+
+    } catch (error) {
+       toast({
+            variant: "destructive",
+            title: "Investment Failed",
+            description: "Could not process your investment. Please try again.",
         });
+    } finally {
+        setIsInvesting(null);
     }
   };
 
@@ -78,8 +115,9 @@ export default function InvestPage() {
               <Button 
                 className="w-full bg-foreground text-background hover:bg-foreground/90"
                 onClick={() => handleInvestment(pkg.name, pkg.price)}
+                disabled={isLoadingBalance || isInvesting === pkg.name}
               >
-                Invest Now
+                {isInvesting === pkg.name ? <Loader2 className="animate-spin" /> : "Invest Now"}
               </Button>
             </CardFooter>
           </Card>

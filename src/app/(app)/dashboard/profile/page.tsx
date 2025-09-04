@@ -25,17 +25,24 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from "@/hooks/use-toast";
 import { Textarea } from "@/components/ui/textarea";
+import { useAuth } from "@/hooks/use-auth";
+import { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 const profileSchema = z.object({
   fullName: z.string().min(1, "Full name is required."),
-  email: z.string().email("Invalid email address."),
+  email: z.string().email("Invalid email address.").readonly(),
   bio: z.string().max(160, "Bio must be 160 characters or less.").optional(),
 });
 
+type ProfileFormValues = z.infer<typeof profileSchema>;
+
 export default function ProfilePage() {
   const { toast } = useToast();
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(false);
 
-  const form = useForm<z.infer<typeof profileSchema>>({
+  const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
       fullName: "",
@@ -44,12 +51,42 @@ export default function ProfilePage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof profileSchema>) {
-    console.log("Profile update:", values);
-    toast({
-      title: "Profile Updated",
-      description: "Your profile has been successfully updated.",
-    });
+  useEffect(() => {
+    if (user) {
+      // --- Backend Data Fetching Placeholder ---
+      // In a real app, you might fetch more profile details from your database
+      // const userProfile = await getUserProfile(user.uid);
+      form.reset({
+        fullName: user.displayName || "",
+        email: user.email || "",
+        bio: "", // This would come from your database, e.g., userProfile.bio
+      });
+    }
+  }, [user, form]);
+
+  async function onSubmit(values: ProfileFormValues) {
+    setLoading(true);
+    try {
+        // --- Backend Logic Placeholder ---
+        // Here you would call your backend to update the user's profile.
+        // This might update Firestore and Firebase Auth profile.
+        // Example: await updateUserProfile(user.uid, values);
+        console.log("Profile update:", values);
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        toast({
+          title: "Profile Updated",
+          description: "Your profile has been successfully updated.",
+        });
+    } catch (error) {
+         toast({
+          variant: "destructive",
+          title: "Update Failed",
+          description: "Could not update your profile. Please try again.",
+        });
+    } finally {
+        setLoading(false);
+    }
   }
 
   return (
@@ -73,8 +110,8 @@ export default function ProfilePage() {
             <CardContent className="space-y-6">
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
-                  <AvatarImage src="https://picsum.photos/200" data-ai-hint="person face" />
-                  <AvatarFallback>U</AvatarFallback>
+                  <AvatarImage src={`https://avatar.vercel.sh/${user?.email}.png`} data-ai-hint="person face" />
+                  <AvatarFallback>{user?.displayName?.charAt(0) ?? "U"}</AvatarFallback>
                 </Avatar>
               </div>
               <div className="grid md:grid-cols-2 gap-4">
@@ -98,7 +135,7 @@ export default function ProfilePage() {
                     <FormItem>
                       <FormLabel>Email Address</FormLabel>
                       <FormControl>
-                        <Input type="email" placeholder="user@example.com" {...field} />
+                        <Input type="email" placeholder="user@example.com" {...field} readOnly className="bg-muted"/>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -124,7 +161,10 @@ export default function ProfilePage() {
                 />
             </CardContent>
             <CardFooter className="border-t px-6 py-4">
-              <Button type="submit">Save Changes</Button>
+              <Button type="submit" disabled={loading}>
+                {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                Save Changes
+              </Button>
             </CardFooter>
           </form>
         </Form>

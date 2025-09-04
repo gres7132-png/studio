@@ -19,17 +19,42 @@ import {
   DollarSign,
 } from "lucide-react";
 import AiSuggestions from "@/components/ai-suggestions";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
+
+interface UserStats {
+  availableBalance: number;
+  todaysEarnings: number;
+  rechargeAmount: number;
+  withdrawalAmount: number;
+}
 
 export default function DashboardPage() {
   const { user } = useAuth();
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  // This data would be fetched from your Firestore database in a real application.
-  const stats = {
-    availableBalance: 0,
-    todaysEarnings: 0,
-    rechargeAmount: 0,
-    withdrawalAmount: 0,
-  };
+  useEffect(() => {
+    if (user) {
+      // --- Backend Data Fetching Placeholder ---
+      const fetchStats = async () => {
+        setLoading(true);
+        // In a real application, you would fetch this data from your backend.
+        // Example: const userStats = await getStatsForUser(user.uid);
+        // For demonstration, we'll use a timeout to simulate a network call.
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        const mockStats: UserStats = {
+          availableBalance: 52340,
+          todaysEarnings: 166,
+          rechargeAmount: 1300,
+          withdrawalAmount: 0,
+        };
+        setStats(mockStats);
+        setLoading(false);
+      };
+      fetchStats();
+    }
+  }, [user]);
 
   return (
     <div className="flex flex-col gap-8">
@@ -46,7 +71,7 @@ export default function DashboardPage() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(stats.availableBalance)}</div>
+                  {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.availableBalance ?? 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -55,7 +80,7 @@ export default function DashboardPage() {
                   <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(stats.todaysEarnings)}</div>
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.todaysEarnings ?? 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -64,7 +89,7 @@ export default function DashboardPage() {
                   <ArrowUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(stats.rechargeAmount)}</div>
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.rechargeAmount ?? 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -73,7 +98,7 @@ export default function DashboardPage() {
                   <ArrowDown className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                  <div className="text-2xl font-bold">{formatCurrency(stats.withdrawalAmount)}</div>
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.withdrawalAmount ?? 0)}</div>}
               </CardContent>
           </Card>
         </div>
