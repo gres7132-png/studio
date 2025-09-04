@@ -32,7 +32,7 @@ export default function InvestPage() {
         setIsLoadingBalance(true);
         // Example: const balance = await getUserBalance(user.uid);
         
-        setUserBalance(52340); // Mock balance
+        // setUserBalance(52340); // Mock balance
         setIsLoadingBalance(false);
       };
       fetchBalance();

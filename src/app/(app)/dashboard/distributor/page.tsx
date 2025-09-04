@@ -61,13 +61,13 @@ export default function DistributorPage() {
             setLoading(true);
             // Example: const data = await getDistributorData(user.uid);
             
-            const mockData: DistributorData = {
-                referredUsersCount: 5,
-                userBalance: 52340,
-                totalDividends: 15000,
-                pendingDividends: 2500,
-            };
-            setDistributorData(mockData);
+            // const mockData: DistributorData = {
+            //     referredUsersCount: 5,
+            //     userBalance: 52340,
+            //     totalDividends: 15000,
+            //     pendingDividends: 2500,
+            // };
+            // setDistributorData(mockData);
             setLoading(false);
         };
         fetchData();

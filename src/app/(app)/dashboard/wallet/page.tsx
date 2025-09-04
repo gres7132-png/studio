@@ -91,16 +91,16 @@ export default function WalletPage() {
         setIsLoadingDetails(true);
         
         // This mock data would be replaced by your backend response
-        const mockDetails: DepositDetails = {
-            mobileMoney: "0712345678",
-            crypto: {
-                BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-                ETH: "0x3bF4aA3A4c9c5B9a4B5E2A0f6A2bA2A4A4b4A4B4",
-                USDT: "0x98c3dE8AFE0aE6C53a485F8585418987348A4624",
-            },
-            minipay: "https://minipay.me/company_xyz",
-        };
-        setDepositDetails(mockDetails);
+        // const mockDetails: DepositDetails = {
+        //     mobileMoney: "0712345678",
+        //     crypto: {
+        //         BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+        //         ETH: "0x3bF4aA3A4c9c5B9a4B5E2A0f6A2bA2A4A4b4A4B4",
+        //         USDT: "0x98c3dE8AFE0aE6C53a485F8585418987348A4624",
+        //     },
+        //     minipay: "https://minipay.me/company_xyz",
+        // };
+        // setDepositDetails(mockDetails);
         setIsLoadingDetails(false);
     };
 
