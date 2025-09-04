@@ -35,37 +35,8 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Copy } from "lucide-react";
-
-const withdrawableBalance = 0;
-
-const withdrawalSchema = z.object({
-  amount: z.coerce
-    .number()
-    .positive({ message: "Amount must be positive." })
-    .min(10, { message: "Minimum withdrawal is $10." })
-    .max(withdrawableBalance, { message: "Amount exceeds withdrawable balance." }),
-});
-
-const bankingDetailsSchema = z.object({
-  paymentMethod: z.enum(["mobile", "crypto", "whatsapp"]),
-  mobileNumber: z.string().optional(),
-  cryptoCurrency: z.enum(["BTC", "ETH", "USDT"]).optional(),
-  cryptoAddress: z.string().optional(),
-  whatsappNumber: z.string().optional(),
-}).refine(data => {
-    if (data.paymentMethod === "mobile") return !!data.mobileNumber;
-    if (data.paymentMethod === "crypto") return !!data.cryptoCurrency && !!data.cryptoAddress;
-    if (data.paymentMethod === "whatsapp") return !!data.whatsappNumber;
-    return true;
-}, {
-    message: "Please fill in the required details for the selected payment method.",
-    path: ["paymentMethod"],
-});
-
-const depositSchema = z.object({
-    transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
-});
+import { Copy, DollarSign } from "lucide-react";
+import { useAuth } from "@/hooks/use-auth";
 
 interface DepositDetails {
     mobileMoney: string;
@@ -77,43 +48,75 @@ interface DepositDetails {
     minipay: string;
 }
 
+interface UserWalletData {
+    withdrawableBalance: number;
+}
+
+
 export default function WalletPage() {
   const { toast } = useToast();
+  const { user } = useAuth();
   const [depositDetails, setDepositDetails] = useState<DepositDetails | null>(null);
-  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
+  const [walletData, setWalletData] = useState<UserWalletData | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // --- Backend Fetching Placeholder ---
-    // In a real application, you would fetch these details from your backend.
-    // This allows an admin to update them without changing the code.
-    // Example: const details = await getCompanyPaymentDetails();
-    const fetchDepositDetails = async () => {
-        setIsLoadingDetails(true);
-        
-        // This mock data would be replaced by your backend response
-        // const mockDetails: DepositDetails = {
-        //     mobileMoney: "0712345678",
-        //     crypto: {
-        //         BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
-        //         ETH: "0x3bF4aA3A4c9c5B9a4B5E2A0f6A2bA2A4A4b4A4B4",
-        //         USDT: "0x98c3dE8AFE0aE6C53a485F8585418987348A4624",
-        //     },
-        //     minipay: "https://minipay.me/company_xyz",
-        // };
-        // setDepositDetails(mockDetails);
-        setIsLoadingDetails(false);
-    };
+    if (user) {
+        const fetchWalletData = async () => {
+            setIsLoading(true);
+            
+            // --- Backend Fetching Placeholder ---
+            // const [details, data] = await Promise.all([
+            //     getCompanyPaymentDetails(),
+            //     getUserWalletData(user.uid)
+            // ]);
+            // setDepositDetails(details);
+            // setWalletData(data);
+            
+            setIsLoading(false);
+        };
+        fetchWalletData();
+    }
+  }, [user]);
 
-    fetchDepositDetails();
-  }, []);
-
-  const copyToClipboard = (text: string, label: string) => {
+  const copyToClipboard = (text: string | undefined, label: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text);
     toast({
       title: "Copied to Clipboard",
       description: `${label} has been copied.`,
     });
   };
+
+  const withdrawableBalance = walletData?.withdrawableBalance ?? 0;
+
+  const withdrawalSchema = z.object({
+    amount: z.coerce
+        .number()
+        .positive({ message: "Amount must be positive." })
+        .min(10, { message: "Minimum withdrawal is $10." })
+        .max(withdrawableBalance, { message: `Amount exceeds withdrawable balance of ${formatCurrency(withdrawableBalance, true)}.` }),
+    });
+
+  const bankingDetailsSchema = z.object({
+    paymentMethod: z.enum(["mobile", "crypto", "whatsapp"]),
+    mobileNumber: z.string().optional(),
+    cryptoCurrency: z.enum(["BTC", "ETH", "USDT"]).optional(),
+    cryptoAddress: z.string().optional(),
+    whatsappNumber: z.string().optional(),
+  }).refine(data => {
+      if (data.paymentMethod === "mobile") return !!data.mobileNumber;
+      if (data.paymentMethod === "crypto") return !!data.cryptoCurrency && !!data.cryptoAddress;
+      if (data.paymentMethod === "whatsapp") return !!data.whatsappNumber;
+      return true;
+  }, {
+      message: "Please fill in the required details for the selected payment method.",
+      path: ["paymentMethod"],
+  });
+
+  const depositSchema = z.object({
+      transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
+  });
 
   const withdrawalForm = useForm<z.infer<typeof withdrawalSchema>>({
     resolver: zodResolver(withdrawalSchema),
@@ -158,11 +161,15 @@ export default function WalletPage() {
 
   const selectedPaymentMethod = bankingDetailsForm.watch("paymentMethod");
 
-  const DetailRow = ({ label, value }: { label: string; value: string }) => (
-    <div className="flex items-center justify-between gap-4 py-2 border-b border-border/50">
+  const DetailRow = ({ label, value }: { label: string; value: string | undefined }) => (
+    <div className="flex items-center justify-between gap-4 py-3 border-b border-border/50">
         <div>
             <p className="text-sm font-semibold text-foreground">{label}</p>
-            <p className="text-sm text-muted-foreground break-all">{value}</p>
+            {value ? (
+                <p className="text-sm text-muted-foreground break-all font-bold">{value}</p>
+            ) : (
+                <Skeleton className="h-5 w-48 mt-1" />
+            )}
         </div>
         <Button 
             size="icon" 
@@ -170,6 +177,7 @@ export default function WalletPage() {
             className="flex-shrink-0"
             onClick={() => copyToClipboard(value, label)}
             aria-label={`Copy ${label}`}
+            disabled={!value}
         >
             <Copy className="h-4 w-4" />
         </Button>
@@ -196,30 +204,19 @@ export default function WalletPage() {
             <CardHeader>
                 <CardTitle>Make a Deposit</CardTitle>
                 <CardDescription>
-                    To add funds, please make a payment to one of the addresses below. These details are provided by the admin and may change.
+                    To add funds, please make a payment to one of the addresses below. These details are provided by the admin.
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="space-y-2 rounded-lg border p-4">
                     <h3 className="font-semibold mb-2">Company Payment Details</h3>
-                    {isLoadingDetails ? (
-                         <div className="space-y-2">
-                            <Skeleton className="h-12 w-full" />
-                            <Skeleton className="h-12 w-full" />
-                            <Skeleton className="h-12 w-full" />
-                            <Skeleton className="h-12 w-full" />
-                        </div>
-                    ) : depositDetails ? (
-                        <div className="space-y-2">
-                            <DetailRow label="Mobile Money (Airtel/Safaricom)" value={depositDetails.mobileMoney} />
-                            <DetailRow label="BTC Address" value={depositDetails.crypto.BTC} />
-                            <DetailRow label="ETH Address" value={depositDetails.crypto.ETH} />
-                            <DetailRow label="USDT Address" value={depositDetails.crypto.USDT} />
-                            <DetailRow label="MiniPay (WhatsApp)" value={depositDetails.minipay} />
-                        </div>
-                    ) : (
-                        <p className="text-sm text-muted-foreground">Could not load payment details. Please try again later.</p>
-                    )}
+                     <div className="space-y-2">
+                        <DetailRow label="Mobile Money (Airtel/Safaricom)" value={depositDetails?.mobileMoney} />
+                        <DetailRow label="BTC Address" value={depositDetails?.crypto.BTC} />
+                        <DetailRow label="ETH Address" value={depositDetails?.crypto.ETH} />
+                        <DetailRow label="USDT Address" value={depositDetails?.crypto.USDT} />
+                        <DetailRow label="MiniPay (WhatsApp)" value={depositDetails?.minipay} />
+                    </div>
                 </div>
 
                 <Form {...depositForm}>
@@ -273,12 +270,12 @@ export default function WalletPage() {
                         <FormLabel>Amount</FormLabel>
                         <FormControl>
                           <div className="relative">
-                            <DollarSignIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                            <DollarSign className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                             <Input type="number" placeholder="0.00" className="pl-8" {...field} />
                           </div>
                         </FormControl>
                         <FormDescription>
-                          Withdrawable balance: {formatCurrency(withdrawableBalance)}
+                           Withdrawable balance: {isLoading ? <Skeleton className="h-4 w-20 inline-block" /> : formatCurrency(withdrawableBalance)}
                         </FormDescription>
                         <FormMessage />
                       </FormItem>
@@ -410,25 +407,5 @@ export default function WalletPage() {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-function DollarSignIcon(props: React.SVGProps<SVGSVGElement>) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <line x1="12" x2="12" y1="2" y2="22" />
-      <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-    </svg>
   );
 }
