@@ -32,10 +32,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useState } from "react";
 import { Textarea } from "@/components/ui/textarea";
 
-const withdrawableBalance = 1234.56;
+const withdrawableBalance = 0; // Set to 0 as per previous changes
 
 const withdrawalSchema = z.object({
   amount: z.coerce
@@ -64,6 +63,17 @@ const bankingDetailsSchema = z.object({
 const depositSchema = z.object({
     transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
 });
+
+// Placeholder for admin-provided details
+const depositDetails = {
+    mobileMoney: "N/A",
+    crypto: {
+        BTC: "N/A",
+        ETH: "N/A",
+        USDT: "N/A",
+    },
+    minipay: "N/A",
+};
 
 export default function WalletPage() {
   const { toast } = useToast();
@@ -127,16 +137,28 @@ export default function WalletPage() {
           <TabsTrigger value="banking">Payment Details</TabsTrigger>
         </TabsList>
         <TabsContent value="deposit">
-          <Card className="max-w-md">
+          <Card className="max-w-lg">
             <CardHeader>
                 <CardTitle>Make a Deposit</CardTitle>
                 <CardDescription>
-                    To add funds, please make a payment to the details provided by your agent. Then, paste the transaction proof below.
+                    To add funds, please make a payment to one of the addresses below. These details are provided by the admin and may change.
                 </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="space-y-6">
+                <div className="space-y-4 rounded-lg border p-4">
+                    <h3 className="font-semibold">Company Payment Details</h3>
+                    <div className="space-y-2 text-sm">
+                        <p><strong className="font-medium">Mobile Money (Airtel/Safaricom):</strong> {depositDetails.mobileMoney}</p>
+                        <p><strong className="font-medium">BTC Address:</strong> {depositDetails.crypto.BTC}</p>
+                        <p><strong className="font-medium">ETH Address:</strong> {depositDetails.crypto.ETH}</p>
+                        <p><strong className="font-medium">USDT Address:</strong> {depositDetails.crypto.USDT}</p>
+                        <p><strong className="font-medium">MiniPay (WhatsApp):</strong> {depositDetails.minipay}</p>
+                    </div>
+                </div>
+
                 <Form {...depositForm}>
                     <form onSubmit={depositForm.handleSubmit(onDepositSubmit)} className="space-y-4">
+                         <p className="text-sm text-muted-foreground">After making a payment, paste the transaction proof below and submit.</p>
                         <FormField
                             control={depositForm.control}
                             name="transactionProof"
@@ -205,9 +227,9 @@ export default function WalletPage() {
         <TabsContent value="banking">
           <Card className="max-w-md">
             <CardHeader>
-              <CardTitle>Payment Details</CardTitle>
+              <CardTitle>My Payment Details</CardTitle>
               <CardDescription>
-                This information is used for processing your withdrawals.
+                This is the information we will use to send you your withdrawals.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -230,8 +252,8 @@ export default function WalletPage() {
                           </FormControl>
                           <SelectContent>
                             <SelectItem value="mobile">Mobile Money (Airtel/Safaricom)</SelectItem>
-                            <SelectItem value="crypto">Crypto Wallet (USDT, ETH, BTC)</SelectItem>
-                            <SelectItem value="whatsapp">WhatsApp (MiniPay for international)</SelectItem>
+                            <SelectItem value="crypto">Crypto Wallet (BTC, ETH, USDT)</SelectItem>
+                            <SelectItem value="whatsapp">WhatsApp (MiniPay)</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -301,7 +323,7 @@ export default function WalletPage() {
                         name="whatsappNumber"
                         render={({ field }) => (
                           <FormItem>
-                            <FormLabel>WhatsApp Number</FormLabel>
+                            <FormLabel>WhatsApp Number (for MiniPay)</FormLabel>
                             <FormControl>
                               <Input placeholder="e.g. +1234567890" {...field} />
                             </FormControl>
@@ -344,3 +366,4 @@ function DollarSignIcon(props: React.SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+    
