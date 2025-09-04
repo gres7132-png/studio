@@ -14,8 +14,7 @@ export function formatCurrency(amount: number, compact = false) {
   });
 
   const kesFormatter = new Intl.NumberFormat('en-KE', {
-    style: 'currency',
-    currency: 'KES',
+    style: 'decimal',
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
     ...(compact && { notation: 'compact' }),
@@ -23,7 +22,7 @@ export function formatCurrency(amount: number, compact = false) {
 
   const kesAmount = amount * 130;
 
-  const formattedKsh = kesFormatter.format(kesAmount).replace(/\s/g, ' ');
+  const formattedKsh = `KES ${kesFormatter.format(kesAmount)}`;
 
   if (compact) {
     return `${usdFormatter.format(amount)}`;
