@@ -15,6 +15,7 @@ import {
   Briefcase,
   DollarSign,
   UserPlus,
+  Gift,
 } from "lucide-react";
 
 import { signOut } from "firebase/auth";
@@ -52,7 +53,8 @@ const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/invest", icon: Briefcase, label: "Product Center" },
   { href: "/dashboard/wallet", icon: Wallet, label: "Withdraw/Deposit" },
-  { href: "/dashboard/referrals", icon: UserPlus, label: "Become a Distributor" },
+  { href: "/dashboard/referrals", icon: UserPlus, label: "Referral Program" },
+  { href: "/dashboard/distributor", icon: Gift, label: "Distributor Program" },
   { href: "/dashboard/commissions", icon: DollarSign, label: "Agent Commissions", disabled: true },
 ];
 
@@ -209,4 +211,3 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
     </SidebarProvider>
   );
 }
-

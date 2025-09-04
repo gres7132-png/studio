@@ -1,4 +1,6 @@
 
+"use client";
+
 import {
   Card,
   CardContent,
@@ -14,79 +16,101 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/hooks/use-auth";
+import { Copy } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
+import { Badge } from "@/components/ui/badge";
 
-const distributorTiers = [
-  { level: 'V1', monthlyIncome: 6500, purchasedProducts: 2, deposit: 39000 },
-  { level: 'V2', monthlyIncome: 13000, purchasedProducts: 3, deposit: 78000 },
-  { level: 'V3', monthlyIncome: 26000, purchasedProducts: 4, deposit: 156000 },
-  { level: 'V4', monthlyIncome: 43333, purchasedProducts: 5, deposit: 260000 },
-  { level: 'V5', monthlyIncome: 108333, purchasedProducts: 6, deposit: 650000 },
+// Mock data for referred users. In a real application, this would be fetched from Firestore.
+const referredUsers = [
+  { id: "user1", name: "Alice", capital: 1000, commission: 50, status: "Active" },
+  { id: "user2", name: "Bob", capital: 500, commission: 25, status: "Active" },
+  { id: "user3", name: "Charlie", capital: 0, commission: 0, status: "Pending" },
 ];
 
 export default function ReferralsPage() {
-  const totalDividends = 0;
-  const pendingDividends = 0;
+  const { user } = useAuth();
+  const { toast } = useToast();
+
+  const referralLink = user
+    ? `${window.location.origin}/auth?ref=${user.uid}`
+    : "";
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(referralLink);
+    toast({
+      title: "Copied!",
+      description: "Your referral link has been copied to your clipboard.",
+    });
+  };
+
+  const totalCommission = referredUsers.reduce((sum, u) => sum + u.commission, 0);
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Company Dividends</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Referral Program</h1>
         <p className="text-muted-foreground">
-          View distributor levels and apply to become one.
+          Earn a 5% commission for every new user you refer who invests.
         </p>
-      </div>
-
-      <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-red-500 text-white">
-          <CardHeader>
-            <CardTitle>TOTAL DIVIDENDS</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{formatCurrency(totalDividends)}</p>
-          </CardContent>
-        </Card>
-        <Card className="bg-green-500 text-white">
-          <CardHeader>
-            <CardTitle>PENDING DIVIDENDS</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-4xl font-bold">{formatCurrency(pendingDividends)}</p>
-          </CardContent>
-        </Card>
       </div>
 
       <Card>
         <CardHeader>
-          <CardTitle>Distributor</CardTitle>
+          <CardTitle>Your Unique Referral Link</CardTitle>
           <CardDescription>
-            Select a distributor level to apply for.
+            Share this link with your friends. When they sign up and invest, you get rewarded.
           </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center gap-2 rounded-lg border bg-muted p-2">
+            <p className="flex-grow text-sm truncate text-muted-foreground">
+              {referralLink || "Loading your link..."}
+            </p>
+            <Button size="icon" variant="ghost" onClick={copyToClipboard} disabled={!user}>
+              <Copy className="h-4 w-4" />
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <Card>
+        <CardHeader>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Your Referrals</CardTitle>
+              <CardDescription>
+                Track the status of your referred users and your commissions.
+              </CardDescription>
+            </div>
+            <div className="text-right">
+                <p className="text-sm text-muted-foreground">Total Commission Earned</p>
+                <p className="text-2xl font-bold">{formatCurrency(totalCommission)}</p>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Level</TableHead>
-                <TableHead>Monthly Income</TableHead>
-                <TableHead>Purchased Products</TableHead>
-                <TableHead>Deposit</TableHead>
-                <TableHead className="text-right">Action</TableHead>
+                <TableHead>User Name</TableHead>
+                <TableHead>Invested Capital</TableHead>
+                <TableHead>Your Commission (5%)</TableHead>
+                <TableHead>Status</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {distributorTiers.map((tier) => (
-                <TableRow key={tier.level}>
-                  <TableCell className="font-medium">
-                    <Badge variant="secondary">{tier.level}</Badge>
-                  </TableCell>
-                  <TableCell>{formatCurrency(tier.monthlyIncome)}</TableCell>
-                  <TableCell>{tier.purchasedProducts}</TableCell>
-                  <TableCell>{formatCurrency(tier.deposit)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="outline" size="sm">Apply</Button>
+              {referredUsers.map((refUser) => (
+                <TableRow key={refUser.id}>
+                  <TableCell className="font-medium">{refUser.name}</TableCell>
+                  <TableCell>{formatCurrency(refUser.capital)}</TableCell>
+                  <TableCell>{formatCurrency(refUser.commission)}</TableCell>
+                  <TableCell>
+                    <Badge variant={refUser.status === 'Active' ? 'default' : 'secondary'}>
+                      {refUser.status}
+                    </Badge>
                   </TableCell>
                 </TableRow>
               ))}
