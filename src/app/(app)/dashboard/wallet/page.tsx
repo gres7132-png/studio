@@ -33,9 +33,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { depositDetails } from "@/lib/config";
+import { useEffect, useState } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
-const withdrawableBalance = 0; // Set to 0 as per previous changes
+const withdrawableBalance = 0;
 
 const withdrawalSchema = z.object({
   amount: z.coerce
@@ -65,8 +66,47 @@ const depositSchema = z.object({
     transactionProof: z.string().min(10, "Please enter a valid transaction ID or hash."),
 });
 
+interface DepositDetails {
+    mobileMoney: string;
+    crypto: {
+        BTC: string;
+        ETH: string;
+        USDT: string;
+    };
+    minipay: string;
+}
+
 export default function WalletPage() {
   const { toast } = useToast();
+  const [depositDetails, setDepositDetails] = useState<DepositDetails | null>(null);
+  const [isLoadingDetails, setIsLoadingDetails] = useState(true);
+
+  useEffect(() => {
+    // --- Backend Fetching Placeholder ---
+    // In a real application, you would fetch these details from your backend.
+    // This allows an admin to update them without changing the code.
+    // Example: const details = await getCompanyPaymentDetails();
+    const fetchDepositDetails = async () => {
+        setIsLoadingDetails(true);
+        // Simulate network delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // This mock data would be replaced by your backend response
+        const mockDetails: DepositDetails = {
+            mobileMoney: "0712345678",
+            crypto: {
+                BTC: "bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh",
+                ETH: "0x3bF4aA3A4c9c5B9a4B5E2A0f6A2bA2A4A4b4A4B4",
+                USDT: "0x98c3dE8AFE0aE6C53a485F8585418987348A4624",
+            },
+            minipay: "https://minipay.me/company_xyz",
+        };
+        setDepositDetails(mockDetails);
+        setIsLoadingDetails(false);
+    };
+
+    fetchDepositDetails();
+  }, []);
 
   const withdrawalForm = useForm<z.infer<typeof withdrawalSchema>>({
     resolver: zodResolver(withdrawalSchema),
@@ -137,13 +177,25 @@ export default function WalletPage() {
             <CardContent className="space-y-6">
                 <div className="space-y-4 rounded-lg border p-4">
                     <h3 className="font-semibold">Company Payment Details</h3>
-                    <div className="space-y-2 text-sm">
-                        <p><strong className="font-medium">Mobile Money (Airtel/Safaricom):</strong> {depositDetails.mobileMoney}</p>
-                        <p><strong className="font-medium">BTC Address:</strong> {depositDetails.crypto.BTC}</p>
-                        <p><strong className="font-medium">ETH Address:</strong> {depositDetails.crypto.ETH}</p>
-                        <p><strong className="font-medium">USDT Address:</strong> {depositDetails.crypto.USDT}</p>
-                        <p><strong className="font-medium">MiniPay (WhatsApp):</strong> {depositDetails.minipay}</p>
-                    </div>
+                    {isLoadingDetails ? (
+                         <div className="space-y-2">
+                            <Skeleton className="h-4 w-4/5" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-full" />
+                            <Skeleton className="h-4 w-3/5" />
+                        </div>
+                    ) : depositDetails ? (
+                        <div className="space-y-2 text-sm">
+                            <p><strong className="font-medium">Mobile Money (Airtel/Safaricom):</strong> {depositDetails.mobileMoney}</p>
+                            <p><strong className="font-medium">BTC Address:</strong> {depositDetails.crypto.BTC}</p>
+                            <p><strong className="font-medium">ETH Address:</strong> {depositDetails.crypto.ETH}</p>
+                            <p><strong className="font-medium">USDT Address:</strong> {depositDetails.crypto.USDT}</p>
+                            <p><strong className="font-medium">MiniPay (WhatsApp):</strong> {depositDetails.minipay}</p>
+                        </div>
+                    ) : (
+                        <p className="text-sm text-muted-foreground">Could not load payment details. Please try again later.</p>
+                    )}
                 </div>
 
                 <Form {...depositForm}>

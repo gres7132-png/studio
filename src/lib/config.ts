@@ -38,15 +38,3 @@ export const commissionTiers = [
   { referrals: 1000, commission: 120000 },
   { referrals: 2000, commission: 300000 },
 ];
-
-// --- Company Deposit Information ---
-// In a real application, these would be managed securely in an admin panel.
-export const depositDetails = {
-    mobileMoney: "N/A",
-    crypto: {
-        BTC: "N/A",
-        ETH: "N/A",
-        USDT: "N/A",
-    },
-    minipay: "N/A",
-};
