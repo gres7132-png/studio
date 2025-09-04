@@ -22,6 +22,7 @@ import { formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users } from "lucide-react";
 
+// The figures are now in KES and will be converted to USD for display.
 const distributorTiers = [
   { level: 'V1', monthlyIncome: 6500, purchasedProducts: 2, deposit: 39000 },
   { level: 'V2', monthlyIncome: 13000, purchasedProducts: 3, deposit: 78000 },
@@ -41,9 +42,9 @@ export default function DistributorPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Distributor Program</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Silver Level Distributor Program</h1>
         <p className="text-muted-foreground">
-          View distributor levels and apply to become one for monthly dividends.
+          View Silver Level distributor levels and apply to become one for monthly dividends.
         </p>
       </div>
 
@@ -58,7 +59,7 @@ export default function DistributorPage() {
       )}
 
       <div className="grid gap-6 md:grid-cols-2">
-        <Card className="bg-red-500 text-white">
+        <Card>
           <CardHeader>
             <CardTitle>TOTAL DIVIDENDS</CardTitle>
           </CardHeader>
@@ -66,7 +67,7 @@ export default function DistributorPage() {
             <p className="text-4xl font-bold">{formatCurrency(totalDividends)}</p>
           </CardContent>
         </Card>
-        <Card className="bg-green-500 text-white">
+        <Card>
           <CardHeader>
             <CardTitle>PENDING DIVIDENDS</CardTitle>
           </CardHeader>
@@ -78,7 +79,7 @@ export default function DistributorPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Distributor Tiers</CardTitle>
+          <CardTitle>Silver Level Tiers</CardTitle>
           <CardDescription>
             Select a distributor level to apply for. Your application is subject to approval.
           </CardDescription>

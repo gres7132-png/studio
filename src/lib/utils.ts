@@ -6,13 +6,6 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function formatCurrency(amount: number, compact = false) {
-  const usdFormatter = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-
   const kesFormatter = new Intl.NumberFormat('en-KE', {
     style: 'decimal',
     minimumFractionDigits: 0,
@@ -20,13 +13,21 @@ export function formatCurrency(amount: number, compact = false) {
     ...(compact && { notation: 'compact' }),
   });
 
-  const kesAmount = amount * 130;
+  const usdFormatter = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
 
-  const formattedKsh = `KES ${kesFormatter.format(kesAmount)}`;
+  const usdAmount = amount / 130; // Convert KES to USD
+
+  const formattedKsh = `KES ${kesFormatter.format(amount)}`;
+  const formattedUsd = usdFormatter.format(usdAmount);
 
   if (compact) {
-    return `${usdFormatter.format(amount)}`;
+    return `${formattedUsd}`; // Compact view shows USD
   }
   
-  return `${usdFormatter.format(amount)} (${formattedKsh})`;
+  return `${formattedKsh} (${formattedUsd})`;
 }
