@@ -18,7 +18,7 @@ import {
   ArrowUp,
   DollarSign,
 } from "lucide-react";
-import AiSuggestions from "@/components/ai-suggestions";
+import LatestTransactions from "@/components/latest-transactions";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
 
@@ -71,7 +71,7 @@ export default function DashboardPage() {
                   <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                  {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.availableBalance ?? 0)}</div>}
+                  {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.availableBalance ?? 0, stats?.availableBalance ? stats.availableBalance / 130 : 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -80,7 +80,7 @@ export default function DashboardPage() {
                   <Activity className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.todaysEarnings ?? 0)}</div>}
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.todaysEarnings ?? 0, stats?.todaysEarnings ? stats.todaysEarnings / 130 : 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -89,7 +89,7 @@ export default function DashboardPage() {
                   <ArrowUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.rechargeAmount ?? 0)}</div>}
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.rechargeAmount ?? 0, stats?.rechargeAmount ? stats.rechargeAmount / 130 : 0)}</div>}
               </CardContent>
           </Card>
           <Card>
@@ -98,7 +98,7 @@ export default function DashboardPage() {
                   <ArrowDown className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.withdrawalAmount ?? 0)}</div>}
+                   {loading ? <Skeleton className="h-8 w-3/4" /> : <div className="text-2xl font-bold">{formatCurrency(stats?.withdrawalAmount ?? 0, stats?.withdrawalAmount ? stats.withdrawalAmount / 130 : 0)}</div>}
               </CardContent>
           </Card>
         </div>
@@ -124,7 +124,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
-      <AiSuggestions />
+      <LatestTransactions />
     </div>
   );
 }
