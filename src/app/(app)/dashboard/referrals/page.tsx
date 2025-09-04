@@ -23,12 +23,9 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for referred users. In a real application, this would be fetched from Firestore.
-const referredUsers = [
-  { id: "user1", name: "Alice", capital: 1000, commission: 50, status: "Active" },
-  { id: "user2", name: "Bob", capital: 500, commission: 25, status: "Active" },
-  { id: "user3", name: "Charlie", capital: 0, commission: 0, status: "Pending" },
-];
+// Mock data for referred users has been removed. 
+// In a real application, this would be fetched from Firestore.
+const referredUsers: any[] = [];
 
 export default function ReferralsPage() {
   const { user } = useAuth();
@@ -102,18 +99,26 @@ export default function ReferralsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {referredUsers.map((refUser) => (
-                <TableRow key={refUser.id}>
-                  <TableCell className="font-medium">{refUser.name}</TableCell>
-                  <TableCell>{formatCurrency(refUser.capital)}</TableCell>
-                  <TableCell>{formatCurrency(refUser.commission)}</TableCell>
-                  <TableCell>
-                    <Badge variant={refUser.status === 'Active' ? 'default' : 'secondary'}>
-                      {refUser.status}
-                    </Badge>
-                  </TableCell>
+              {referredUsers.length > 0 ? (
+                referredUsers.map((refUser) => (
+                  <TableRow key={refUser.id}>
+                    <TableCell className="font-medium">{refUser.name}</TableCell>
+                    <TableCell>{formatCurrency(refUser.capital)}</TableCell>
+                    <TableCell>{formatCurrency(refUser.commission)}</TableCell>
+                    <TableCell>
+                      <Badge variant={refUser.status === 'Active' ? 'default' : 'secondary'}>
+                        {refUser.status}
+                      </Badge>
+                    </TableCell>
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                    <TableCell colSpan={4} className="text-center text-muted-foreground">
+                        You have not referred any users yet.
+                    </TableCell>
                 </TableRow>
-              ))}
+              )}
             </TableBody>
           </Table>
         </CardContent>

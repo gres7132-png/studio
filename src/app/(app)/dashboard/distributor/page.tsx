@@ -34,7 +34,7 @@ const distributorTiers = [
 
 // Mock data to simulate whether the user has met the prerequisite.
 // In a real application, this would be determined by checking the database.
-const referredUsersCount = 2; // Change to 1 or 0 to see the prerequisite message.
+const referredUsersCount = 0; 
 
 // This should be fetched from your backend.
 const userBalance = 0; 

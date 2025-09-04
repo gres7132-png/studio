@@ -1,3 +1,4 @@
+
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -37,9 +38,9 @@ export default function ProfilePage() {
   const form = useForm<z.infer<typeof profileSchema>>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: "John Doe",
-      email: "user@example.com",
-      bio: "Seasoned investor with a focus on high-growth tech and renewable energy sectors.",
+      fullName: "",
+      email: "",
+      bio: "",
     },
   });
 
@@ -73,7 +74,7 @@ export default function ProfilePage() {
               <div className="flex items-center space-x-4">
                 <Avatar className="h-20 w-20">
                   <AvatarImage src="https://picsum.photos/200/200" data-ai-hint="person face" />
-                  <AvatarFallback>JD</AvatarFallback>
+                  <AvatarFallback>U</AvatarFallback>
                 </Avatar>
                 <div className="space-y-1">
                     <Button type="button">Change Photo</Button>
