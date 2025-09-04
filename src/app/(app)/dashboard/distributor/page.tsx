@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/lib/utils";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 // The figures are now in KES and will be converted to USD for display.
 const distributorTiers = [
@@ -35,9 +36,31 @@ const distributorTiers = [
 // In a real application, this would be determined by checking the database.
 const referredUsersCount = 2; // Change to 1 or 0 to see the prerequisite message.
 
+// This should be fetched from your backend.
+const userBalance = 0; 
+
 export default function DistributorPage() {
+  const { toast } = useToast();
   const totalDividends = 0;
   const pendingDividends = 0;
+
+  const handleApply = (level: string, deposit: number) => {
+    if (userBalance < deposit) {
+      toast({
+        variant: "destructive",
+        title: "Insufficient Funds",
+        description: "Please make a deposit to apply for this level.",
+      });
+    } else {
+      // This is where you would open a confirmation popup/modal.
+      // The modal would call a backend function to process the application.
+      console.log(`Proceeding with application for ${level}...`);
+      toast({
+        title: "Application Successful!",
+        description: `You have applied for the ${level} distributor level.`,
+      });
+    }
+  };
 
   return (
     <div className="space-y-8">
@@ -105,7 +128,14 @@ export default function DistributorPage() {
                   <TableCell>{tier.purchasedProducts}</TableCell>
                   <TableCell>{formatCurrency(tier.deposit)}</TableCell>
                   <TableCell className="text-right">
-                    <Button variant="outline" size="sm" disabled={referredUsersCount < 2}>Apply</Button>
+                    <Button 
+                      variant="outline" 
+                      size="sm" 
+                      disabled={referredUsersCount < 2}
+                      onClick={() => handleApply(tier.level, tier.deposit)}
+                    >
+                      Apply
+                    </Button>
                   </TableCell>
                 </TableRow>
               ))}
