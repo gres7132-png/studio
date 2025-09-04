@@ -21,9 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Users } from "lucide-react";
 import { commissionTiers } from "@/lib/config";
 
-// Mock data to simulate the user's current referral count.
-// In a real application, this would be determined by checking the database
-// for referred users who have made an investment.
+// In a real application, this would be determined by fetching data from the backend.
 const userActiveReferrals = 0; 
 
 export default function AgentCommissionsPage() {

@@ -20,6 +20,7 @@ export default function InvestPage() {
   const { toast } = useToast();
 
   const handleInvestment = (packageName: string, price: number) => {
+    // In a real app, userBalance would be fetched from a backend service
     if (userBalance < price) {
         toast({
             variant: "destructive",

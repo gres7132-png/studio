@@ -18,6 +18,7 @@ import {
   ArrowUp,
   DollarSign,
 } from "lucide-react";
+import AiSuggestions from "@/components/ai-suggestions";
 
 export default function DashboardPage() {
   const { user } = useAuth();
@@ -98,6 +99,7 @@ export default function DashboardPage() {
         </Card>
       </div>
 
+      <AiSuggestions />
     </div>
   );
 }

@@ -24,27 +24,34 @@ import { useToast } from "@/hooks/use-toast";
 import { formatCurrency } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 
-// Mock data for referred users. 
-// In a real application, this would be fetched from your backend database (e.g., Firestore).
-const mockReferredUsers = [
-  { id: '1', name: 'Alice Johnson', capital: 50000, commission: 2500, status: 'Active' },
-  { id: '2', name: 'Bob Williams', capital: 0, commission: 0, status: 'Pending' },
-  { id: '3', name: 'Charlie Brown', capital: 120000, commission: 6000, status: 'Active' },
-  { id: '4', name: 'Diana Miller', capital: 75000, commission: 3750, status: 'Active' },
-];
-
+// This interface defines the structure for a referred user object.
+interface ReferredUser {
+    id: string;
+    name: string;
+    capital: number;
+    commission: number;
+    status: 'Active' | 'Pending';
+}
 
 export default function ReferralsPage() {
   const { user } = useAuth();
   const { toast } = useToast();
   const [referralLink, setReferralLink] = useState("");
   
-  // In a real app, you would fetch this data from your backend.
-  const referredUsers = mockReferredUsers;
+  // This state will hold the list of users referred by the current user.
+  // In a real application, you would fetch this data from your backend (e.g., Firestore).
+  const [referredUsers, setReferredUsers] = useState<ReferredUser[]>([]);
 
   useEffect(() => {
     if (user) {
       setReferralLink(`${window.location.origin}/auth?ref=${user.uid}`);
+      
+      // --- Backend Data Fetching Placeholder ---
+      // const fetchReferredUsers = async () => {
+      //   // Example: const users = await getReferredUsers(user.uid);
+      //   // setReferredUsers(users);
+      // };
+      // fetchReferredUsers();
     }
   }, [user]);
 

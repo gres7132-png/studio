@@ -35,12 +35,9 @@ import { Users, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { distributorTiers } from "@/lib/config";
 
-// Mock data to simulate whether the user has met the prerequisite.
-// In a real application, this would be determined by checking the database.
-const referredUsersCount = 2; 
-
-// This should be fetched from your backend.
-const userBalance = 50000; 
+// In a real application, these values would be fetched from your backend.
+const referredUsersCount = 0; 
+const userBalance = 0; 
 
 type Tier = typeof distributorTiers[0];
 
@@ -49,6 +46,7 @@ export default function DistributorPage() {
   const [isApplying, setIsApplying] = useState(false);
   const [selectedTier, setSelectedTier] = useState<Tier | null>(null);
   
+  // These values should be fetched from your backend.
   const totalDividends = 0;
   const pendingDividends = 0;
 
