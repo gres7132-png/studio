@@ -10,6 +10,7 @@ import {
   User,
   LogOut,
   Settings,
+  LineChart,
 } from "lucide-react";
 
 import {
@@ -40,6 +41,7 @@ import type { ReactNode } from "react";
 const navItems = [
   { href: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
   { href: "/dashboard/invest", icon: TrendingUp, label: "Invest" },
+  { href: "/dashboard/yield-projections", icon: LineChart, label: "Yield Projections" },
   { href: "/dashboard/referrals", icon: Users, label: "Referrals" },
   { href: "/dashboard/wallet", icon: Wallet, label: "Wallet" },
 ];
@@ -62,7 +64,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <SidebarMenuItem key={item.href}>
                 <Link href={item.href} legacyBehavior passHref>
                   <SidebarMenuButton
-                    isActive={pathname === item.href}
+                    isActive={pathname.startsWith(item.href) && (item.href === '/dashboard' ? pathname === item.href : true)}
                     tooltip={item.label}
                   >
                     <item.icon />
