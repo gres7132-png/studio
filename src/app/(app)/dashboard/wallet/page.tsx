@@ -35,6 +35,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Copy } from "lucide-react";
 
 const withdrawableBalance = 0;
 
@@ -108,6 +109,14 @@ export default function WalletPage() {
     fetchDepositDetails();
   }, []);
 
+  const copyToClipboard = (text: string, label: string) => {
+    navigator.clipboard.writeText(text);
+    toast({
+      title: "Copied to Clipboard",
+      description: `${label} has been copied.`,
+    });
+  };
+
   const withdrawalForm = useForm<z.infer<typeof withdrawalSchema>>({
     resolver: zodResolver(withdrawalSchema),
   });
@@ -151,6 +160,24 @@ export default function WalletPage() {
 
   const selectedPaymentMethod = bankingDetailsForm.watch("paymentMethod");
 
+  const DetailRow = ({ label, value }: { label: string; value: string }) => (
+    <div className="flex items-center justify-between gap-4 py-2 border-b border-border/50">
+        <div>
+            <p className="text-sm font-semibold text-foreground">{label}</p>
+            <p className="text-sm text-muted-foreground break-all">{value}</p>
+        </div>
+        <Button 
+            size="icon" 
+            variant="ghost" 
+            className="flex-shrink-0"
+            onClick={() => copyToClipboard(value, label)}
+            aria-label={`Copy ${label}`}
+        >
+            <Copy className="h-4 w-4" />
+        </Button>
+    </div>
+  );
+
   return (
     <div className="space-y-8">
       <div>
@@ -175,23 +202,22 @@ export default function WalletPage() {
                 </CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
-                <div className="space-y-4 rounded-lg border p-4">
-                    <h3 className="font-semibold">Company Payment Details</h3>
+                <div className="space-y-2 rounded-lg border p-4">
+                    <h3 className="font-semibold mb-2">Company Payment Details</h3>
                     {isLoadingDetails ? (
                          <div className="space-y-2">
-                            <Skeleton className="h-4 w-4/5" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-full" />
-                            <Skeleton className="h-4 w-3/5" />
+                            <Skeleton className="h-12 w-full" />
+                            <Skeleton className="h-12 w-full" />
+                            <Skeleton className="h-12 w-full" />
+                            <Skeleton className="h-12 w-full" />
                         </div>
                     ) : depositDetails ? (
-                        <div className="space-y-2 text-sm">
-                            <p><strong className="font-medium">Mobile Money (Airtel/Safaricom):</strong> {depositDetails.mobileMoney}</p>
-                            <p><strong className="font-medium">BTC Address:</strong> {depositDetails.crypto.BTC}</p>
-                            <p><strong className="font-medium">ETH Address:</strong> {depositDetails.crypto.ETH}</p>
-                            <p><strong className="font-medium">USDT Address:</strong> {depositDetails.crypto.USDT}</p>
-                            <p><strong className="font-medium">MiniPay (WhatsApp):</strong> {depositDetails.minipay}</p>
+                        <div className="space-y-2">
+                            <DetailRow label="Mobile Money (Airtel/Safaricom)" value={depositDetails.mobileMoney} />
+                            <DetailRow label="BTC Address" value={depositDetails.crypto.BTC} />
+                            <DetailRow label="ETH Address" value={depositDetails.crypto.ETH} />
+                            <DetailRow label="USDT Address" value={depositDetails.crypto.USDT} />
+                            <DetailRow label="MiniPay (WhatsApp)" value={depositDetails.minipay} />
                         </div>
                     ) : (
                         <p className="text-sm text-muted-foreground">Could not load payment details. Please try again later.</p>
