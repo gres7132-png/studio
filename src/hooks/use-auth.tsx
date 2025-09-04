@@ -7,10 +7,16 @@ import { firebaseConfig } from "@/lib/firebase";
 import { usePathname, useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// --- Admin Configuration ---
+// Add the email addresses of admin users to this array.
+// This is a simple and secure way to manage roles for a small number of admins.
+const ADMIN_EMAILS = ["admin@example.com"]; // Replace with your actual admin email
+
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   auth: Auth;
+  isAdmin: boolean; // Flag to indicate if the user is an admin
 }
 
 // Initialize Firebase on the client side
@@ -21,6 +27,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   auth: auth,
+  isAdmin: false,
 });
 
 // Loading component to show while we check for authentication state
@@ -40,51 +47,46 @@ function AuthLoading() {
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
   const isAuthPage = pathname.startsWith('/auth');
 
   useEffect(() => {
-    // This listener is the core of our authentication state management.
-    // It fires once when it's first attached, and again any time the user's auth state changes.
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setUser(user);
+      if (user) {
+        setUser(user);
+        // Check if the logged-in user's email is in the admin list
+        setIsAdmin(ADMIN_EMAILS.includes(user.email || ""));
+      } else {
+        setUser(null);
+        setIsAdmin(false);
+      }
       setLoading(false);
     });
 
-    // Cleanup the listener when the component unmounts
     return () => unsubscribe();
-  }, []); // The empty dependency array ensures this effect runs only once on mount
+  }, []);
 
   useEffect(() => {
-    // This effect handles routing logic based on the auth state.
-    // It runs whenever `loading` or `user` changes.
     if (!loading) {
       if (user && isAuthPage) {
-        // If the user is logged in and on an auth page, redirect to dashboard.
         router.push('/dashboard');
       } else if (!user && !isAuthPage) {
-        // If the user is not logged in and not on an auth page, redirect to auth.
         router.push("/auth");
       }
     }
   }, [user, loading, isAuthPage, router]);
 
-  // If we are still checking the auth state, and we are not on the public auth page,
-  // show a loading screen to prevent a flicker of protected content.
   if (loading && !isAuthPage) {
       return <AuthLoading />;
   }
   
-  // If we are done loading and the user is authenticated, OR if we are on the public auth page,
-  // render the children components.
   if ((!loading && user) || isAuthPage) {
-      return <AuthContext.Provider value={{ user, loading, auth }}>{children}</AuthContext.Provider>;
+      return <AuthContext.Provider value={{ user, loading, auth, isAdmin }}>{children}</AuthContext.Provider>;
   }
 
-  // This will be the case for an unauthenticated user trying to access a protected page
-  // after the initial load. They will be redirected by the effect above, but we return null here.
   return null;
 };
 
