@@ -42,9 +42,9 @@ export default function DistributorPage() {
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Silver Level Distributor Program</h1>
+        <h1 className="text-3xl font-bold tracking-tight">Golden Level Distributor Program</h1>
         <p className="text-muted-foreground">
-          View Silver Level distributor levels and apply to become one for monthly dividends.
+          View Golden Level distributor levels and apply to become one for monthly dividends.
         </p>
       </div>
 
@@ -79,7 +79,7 @@ export default function DistributorPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>Silver Level Tiers</CardTitle>
+          <CardTitle>Golden Level Tiers</CardTitle>
           <CardDescription>
             Select a distributor level to apply for. Your application is subject to approval.
           </CardDescription>
